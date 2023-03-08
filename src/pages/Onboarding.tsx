@@ -135,6 +135,13 @@ export function ShareholdersStep() {
   const [newShareholder, setNewShareholder] = React.useState<
     Omit<Shareholder, "id" | "grants">
   >({ name: "", group: "employee" });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!companyName) {
+      return navigate("/start/company");
+    }
+  }, [companyName]);
 
   function submitNewShareholder(e: React.FormEvent) {
     e.preventDefault();
