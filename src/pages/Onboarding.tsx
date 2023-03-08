@@ -162,7 +162,6 @@ export function ShareholdersStep() {
               />
               {/* TODO: bad any */}
               <Select
-                placeholder="Type of shareholder"
                 value={newShareholder.group}
                 onChange={(e) =>
                   setNewShareholder((s) => ({
@@ -171,6 +170,7 @@ export function ShareholdersStep() {
                   }))
                 }
               >
+                <option disabled value="">Type of Shareholder</option>
                 <option value="investor">Investor</option>
                 <option value="founder">Founder</option>
                 <option value="employee">Employee</option>
