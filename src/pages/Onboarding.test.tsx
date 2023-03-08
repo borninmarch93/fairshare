@@ -280,6 +280,7 @@ describe("Onboarding", () => {
     expect(nameField).toBeInTheDocument();
   });
 
+  //Bug 02
   it("should not allow registering without company name", async () => {
     const Router = getTestRouter("/start/company");
     render(
@@ -302,6 +303,7 @@ describe("Onboarding", () => {
     expect(companyNameField).toBeInTheDocument();
   });
 
+  //Bug 03
   it("should not allow adding shareholder without name", async () => {
     const Router = getTestRouter("/start/shareholders");
     render(
@@ -333,5 +335,37 @@ describe("Onboarding", () => {
     await userEvent.click(createButton);
     expect(newShareholderNameField).toBeInTheDocument();
   });
+
+  //Bug 04
+  it("should not allow adding placeholder as type of shareholder", async () => {
+    const Router = getTestRouter("/start/shareholders");
+    render(
+      <Router>
+        <Page
+          initialState={{
+            ...defaultOnboardingState,
+            companyName: "My Company",
+            shareholders: {
+              "0": { name: "Jenn", group: "founder", grants: [], id: 0 },
+            },
+          }}
+        />
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+  
+    const addShareholdersButton = screen.getByRole("button", {
+      name: "Add Shareholder",
+    });
+    await userEvent.click(addShareholdersButton);
+  
+    let newShareholderNameField = screen.getByRole("textbox");
+    let defaultOption = screen.getByRole('option', { name: "Type of Shareholder" });
+    await waitFor(() => {
+      expect(newShareholderNameField).toBeVisible();
+    });
+  
+    expect(defaultOption).toBeDisabled();
+  });  
 
 });
