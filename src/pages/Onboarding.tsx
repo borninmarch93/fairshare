@@ -53,7 +53,7 @@ export function UserStep() {
 
   function onSubmt(e: React.FormEvent) {
     e.preventDefault();
-    navigate("../company");
+    navigate("/start/company");
   }
 
   return (
@@ -222,8 +222,8 @@ export function ShareholderGrantsStep() {
     return <Navigate to="/start/shareholders" replace={true} />;
   }
   const nextLink = !shareholders[shareholder.id + 1]
-    ? `../done`
-    : `../grants/${shareholder.id + 1}`;
+    ? `/done`
+    : `/start/grants/${shareholder.id + 1}`;
 
   const isGrantValid = draftGrant.name.length && draftGrant.amount && draftGrant.issued;
 
