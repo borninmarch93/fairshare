@@ -116,7 +116,7 @@ export function CompanyStep() {
           value={companyName}
         />
       </FormControl>
-      <Button type="submit" colorScheme="teal" disabled={!companyName.length}>
+      <Button type="submit" colorScheme="teal" isDisabled={!companyName.length}>
         Next
       </Button>
     </Stack>
