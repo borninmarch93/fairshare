@@ -1,4 +1,5 @@
 import React from "react";
+import { createMemoryHistory } from 'history';
 import { render, screen, waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import {
   CompanyStep,
@@ -367,5 +368,24 @@ describe("Onboarding", () => {
   
     expect(defaultOption).toBeDisabled();
   });  
+
+  //Bug 05
+  it('should not access company step directly',  async () => {
+    const Router = getTestRouter("/start/company");
+    
+    render(
+      <Router>
+        <Page/>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const history = createMemoryHistory();
+    const companyNameField = screen.queryByRole("textbox", {
+      name: /company are we/,
+    });
+    expect(companyNameField).not.toBeInTheDocument();
+    expect(history.location.pathname).toBe('/');
+  });
 
 });
