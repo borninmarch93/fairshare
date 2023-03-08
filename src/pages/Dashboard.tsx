@@ -102,7 +102,7 @@ export function Dashboard() {
         .filter((s) => s.group === group)
         .flatMap((s) => s.grants)
         .reduce((acc, grantID) => acc + grant.data[grantID].amount, 0),
-    }));
+    })).filter((group) => group.y > 0);
   }
 
   function getInvestorData() {
@@ -159,7 +159,7 @@ export function Dashboard() {
       </Stack>
       <VictoryPie
         colorScale="blue"
-        data={mode === "investor" ? getGroupData() : getInvestorData()}
+        data={mode === "investor" ? getInvestorData() : getGroupData()}
       />
       <Stack divider={<StackDivider />}>
         <Heading>Shareholders</Heading>
