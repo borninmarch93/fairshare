@@ -223,7 +223,7 @@ export function ShareholderGrantsStep() {
   }
   const nextLink = !shareholders[shareholder.id + 1]
     ? `../done`
-    : `../../grants/${shareholder.id + 1}`;
+    : `../grants/${shareholder.id + 1}`;
 
   function submitGrant(e: React.FormEvent) {
     e.preventDefault();
