@@ -239,8 +239,6 @@ export function ShareholderGrantsStep() {
     onClose();
     setDraftGrant({ name: "", amount: 0, issued: "", type: "common" });
   }
-  console.log(shareholder)
-
   return (
     <Stack>
       <Text color="teal-400">
@@ -303,7 +301,7 @@ export function ShareholderGrantsStep() {
                 onChange={(e) =>
                   setDraftGrant((g) => ({
                     ...g,
-                    amount: parseInt(e.target.value, 3),
+                    amount: parseInt(e.target.value),
                   }))
                 }
               />
