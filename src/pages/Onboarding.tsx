@@ -86,7 +86,7 @@ export function UserStep() {
       <Button
         type="submit"
         colorScheme="teal"
-        disabled={!userName.length || !email.length}
+        isDisabled={!userName.length || !email.length}
       >
         Next
       </Button>
