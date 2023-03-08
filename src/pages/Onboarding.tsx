@@ -225,6 +225,8 @@ export function ShareholderGrantsStep() {
     ? `../done`
     : `../grants/${shareholder.id + 1}`;
 
+  const isGrantValid = draftGrant.name.length && draftGrant.amount && draftGrant.issued;
+
   function submitGrant(e: React.FormEvent) {
     e.preventDefault();
     dispatch({
@@ -317,7 +319,7 @@ export function ShareholderGrantsStep() {
                 }
               />
             </FormControl>
-            <Button type="submit">Save</Button>
+            <Button type="submit" isDisabled={!isGrantValid}>Save</Button>
           </Stack>
         </ModalContent>
       </Modal>
