@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { VictoryPie } from "victory";
 import { Link, useParams } from "react-router-dom";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
@@ -26,6 +26,7 @@ import {
 import { Grant, Shareholder } from "../types";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import produce from "immer";
+import { AuthContext } from "../App";
 
 export function Dashboard() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -34,6 +35,7 @@ export function Dashboard() {
     Omit<Shareholder, "id" | "grants">
   >({ name: "", group: "employee" });
   const { mode } = useParams();
+  const { deauthorize } = useContext(AuthContext);
 
   const shareholderMutation = useMutation<
     Shareholder,
@@ -156,6 +158,11 @@ export function Dashboard() {
             By Group
           </Button>
         </Stack>
+        <Stack direction="row" justify="flex-end" >
+          <Button colorScheme="teal" onClick={deauthorize}>
+            Logout
+          </Button>
+        </Stack> 
       </Stack>
       <VictoryPie
         colorScale="blue"

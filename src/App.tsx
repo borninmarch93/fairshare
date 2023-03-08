@@ -12,11 +12,11 @@ import { ShareholderPage } from "./pages/Shareholder";
 export const AuthContext = React.createContext<{
   user: User | undefined;
   authorize: (user: User) => void;
-  deauthroize: () => void;
+  deauthorize: () => void;
 }>({
   user: undefined,
   authorize: () => {},
-  deauthroize: () => {},
+  deauthorize: () => {},
 });
 
 function App() {
@@ -34,39 +34,44 @@ function App() {
     }
   }, [user]);
 
+  const logoutUser = () => {
+    localStorage.removeItem("session");
+    setUser(undefined);
+ }
+  
   return (
     <AuthContext.Provider
       value={{
         user,
         authorize: setUser,
-        deauthroize: () => setUser(undefined),
+        deauthorize: logoutUser,
       }}
     >
-      <Container paddingTop="16" paddingBottom="16">
-        <Routes>
-          {user ? (
-            <>
-              <Route
-                path="/dashboard"
-                element={<Navigate to="/dashboard/investor" replace={true} />}
-              />
-              <Route path="/dashboard/:mode" element={<Dashboard />} />
-              <Route
-                path="/shareholder/:shareholderID"
-                element={<ShareholderPage />}
-              />
-              <Route path="/*" element={<Navigate to="/dashboard" />} />
-            </>
-          ) : (
-            <>
-              <Route path="/" element={<Home />} />
-              <Route path="/start/*" element={<Start />} />
-              <Route path="/signin" element={<Signin />} />
-              <Route path="/*" element={<Navigate to="/" />} />
-            </>
-          )}
-        </Routes>
-      </Container>
+        <Container paddingTop="16" paddingBottom="16">
+          <Routes>
+            {user ? (
+              <>
+                <Route
+                  path="/dashboard"
+                  element={<Navigate to="/dashboard/investor" replace={true} />}
+                />
+                <Route path="/dashboard/:mode" element={<Dashboard />} />
+                <Route
+                  path="/shareholder/:shareholderID"
+                  element={<ShareholderPage />}
+                />
+                <Route path="/*" element={<Navigate to="/dashboard" />} />
+              </>
+            ) : (
+              <>
+                <Route path="/" element={<Home />} />
+                <Route path="/start/*" element={<Start />} />
+                <Route path="/signin" element={<Signin />} />
+                <Route path="/*" element={<Navigate to="/" />} />
+              </>
+            )}
+          </Routes>
+        </Container>
     </AuthContext.Provider>
   );
 }
