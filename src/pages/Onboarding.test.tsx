@@ -388,4 +388,23 @@ describe("Onboarding", () => {
     expect(history.location.pathname).toBe('/');
   });
 
+  //Bug 06
+  it('should not access add shareholders step directly',  async () => {
+    const Router = getTestRouter("/start/shareholders");
+    
+    render(
+      <Router>
+        <Page/>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const history = createMemoryHistory();
+    const addShareholdersButton = screen.queryByRole("button", {
+      name: "Add Shareholder",
+    });
+    expect(addShareholdersButton).not.toBeInTheDocument();
+    expect(history.location.pathname).toBe('/');
+  });
+
 });
