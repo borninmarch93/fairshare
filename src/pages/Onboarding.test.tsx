@@ -458,4 +458,35 @@ describe("Onboarding", () => {
     expect(saveButton).toBeDisabled();
   });
 
+  //bug 09
+  it('should be able to add any number of shares',  async () => {
+    const Router = getTestRouter("/start/grants/0");
+    render(
+      <Router>
+        <Page
+          initialState={{
+            ...defaultOnboardingState,
+            shareholders: {
+              "0": { name: "Jenn", group: "founder", grants: [], id: 0 },
+            },
+          }}
+        />
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const addGrantButton = screen.getByRole("button", { name: /Add Grant/ });
+    await userEvent.click(addGrantButton);
+
+    let grantAmountInput = screen.getByTestId("grant-amount");
+    await waitFor(() => {
+      expect(grantAmountInput).toBeVisible();
+    });
+
+    await userEvent.click(grantAmountInput);
+    await userEvent.paste("5");
+
+    expect(grantAmountInput).toHaveValue("5");
+  });
+
 });
