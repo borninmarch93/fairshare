@@ -175,7 +175,7 @@ export function ShareholdersStep() {
                 <option value="founder">Founder</option>
                 <option value="employee">Employee</option>
               </Select>
-              <Button type="submit" colorScheme="teal">
+              <Button type="submit" colorScheme="teal" isDisabled={!newShareholder.name.length}>
                 Create
               </Button>
             </Stack>
