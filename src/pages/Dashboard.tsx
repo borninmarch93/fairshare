@@ -209,7 +209,6 @@ export function Dashboard() {
                 }
               />
               <Select
-                placeholder="Type of shareholder"
                 value={newShareholder.group}
                 onChange={(e) =>
                   setNewShareholder((s) => ({
@@ -218,11 +217,12 @@ export function Dashboard() {
                   }))
                 }
               >
+                <option disabled value="">Type of Shareholder</option>
                 <option value="investor">Investor</option>
                 <option value="founder">Founder</option>
                 <option value="employee">Employee</option>
               </Select>
-              <Button type="submit" colorScheme="teal">
+              <Button type="submit" colorScheme="teal" isDisabled={!newShareholder.name.length}>
                 Save
               </Button>
             </Stack>
