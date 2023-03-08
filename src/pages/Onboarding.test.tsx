@@ -259,4 +259,24 @@ describe("Onboarding", () => {
   }, 10000);
 
   it.todo("should persist onboard config");
+
+  //Bug 01
+  it("should not allow registering without email", async () => {
+    const Router = getTestRouter("/");
+    render(
+      <Router>
+        <Page />
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+    const nameField = screen.getByRole("textbox", { name: /who is setting/ });
+    await userEvent.click(nameField)
+    await userEvent.type(nameField, "Terry");
+    expect(nameField).toHaveValue("Terry");
+
+    const nextButton = screen.getByRole("button", { name: "Next" });
+    expect(nextButton).toBeDisabled();
+    await userEvent.click(nextButton);
+    expect(nameField).toBeInTheDocument();
+  });
 });
