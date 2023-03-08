@@ -458,7 +458,7 @@ describe("Onboarding", () => {
     expect(saveButton).toBeDisabled();
   });
 
-  //bug 09
+  //Bug 09
   it('should be able to add any number of shares',  async () => {
     const Router = getTestRouter("/start/grants/0");
     render(

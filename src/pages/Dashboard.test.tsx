@@ -1,6 +1,6 @@
 import React from "react";
+import { createMemoryHistory } from 'history';
 import {
-  prettyDOM,
   render,
   screen,
   waitFor,
@@ -410,4 +410,54 @@ describe("Dashboard", () => {
     await userEvent.click(saveButton);
     expect(newShareholderNameField).toBeInTheDocument();
   });
+
+  //Bug 12
+  it("should be logout button", async () => {
+    const Router = getTestRouter("/dashboard/investor");
+
+    const handlers = getHandlers(
+      {
+        company: { name: "My Company" },
+        shareholders: {
+          0: { name: "Tonya", grants: [1], group: "founder", id: 0 },
+          3: { name: "Timothy", grants: [6], group: "investor", id: 3 },
+        },
+        grants: {
+          1: {
+            id: 1,
+            name: "Initial Grant",
+            amount: 1000,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+          6: {
+            id: 6,
+            name: "Series A Purchase",
+            amount: 500,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+        },
+      },
+      false
+    );
+    server.use(...handlers);
+
+    render(
+      <Router>
+        <Routes>
+          <Route path="/dashboard/:mode" element={<Dashboard />} />
+        </Routes>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+    const history = createMemoryHistory();
+    const logoutButton = await screen.findByRole("button", {
+      name: /logout/i,
+    });
+    await userEvent.click(logoutButton);
+    expect(localStorage.getItem('session')).toBeNull();
+    expect(history.location.pathname).toBe('/');
+  });
 });
+
