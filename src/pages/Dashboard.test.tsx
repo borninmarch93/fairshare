@@ -1,4 +1,5 @@
 import React from "react";
+import { createMemoryHistory } from 'history';
 import {
   render,
   screen,
@@ -305,4 +306,158 @@ describe("Dashboard", () => {
       await screen.findByTestId("shareholder-Mike-group")
     ).toHaveTextContent("investor");
   }, 10000);
+
+  //Bug 10
+  it("should not show chart labels for non-existent data", async () => {
+    const Router = getTestRouter("/dashboard/group");
+
+    const handlers = getHandlers(
+      {
+        company: { name: "My Company" },
+        shareholders: {
+          0: { name: "Tonya", grants: [1], group: "founder", id: 0 },
+          3: { name: "Timothy", grants: [6], group: "investor", id: 3 },
+        },
+        grants: {
+          1: {
+            id: 1,
+            name: "Initial Grant",
+            amount: 1000,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+          6: {
+            id: 6,
+            name: "Series A Purchase",
+            amount: 500,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+        },
+      },
+      false
+    );
+    server.use(...handlers);
+
+    render(
+      <Router>
+        <Routes>
+          <Route path="/dashboard/:mode" element={<Dashboard />} />
+        </Routes>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const chart = await screen.findByRole("img");
+    expect(within(chart).getByText(/founder/)).toBeInTheDocument();
+    expect(within(chart).getByText(/investor/)).toBeInTheDocument();
+    expect(within(chart).queryByText(/employee/)).not.toBeInTheDocument();
+   
+  });
+
+  //Bug 11
+  it("should not allow adding shareholder without name", async () => {
+    const Router = getTestRouter("/dashboard/investor");
+
+    const handlers = getHandlers(
+      {
+        company: { name: "My Company" },
+        shareholders: {
+          0: { name: "Tonya", grants: [1], group: "founder", id: 0 },
+          3: { name: "Timothy", grants: [6], group: "investor", id: 3 },
+        },
+        grants: {
+          1: {
+            id: 1,
+            name: "Initial Grant",
+            amount: 1000,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+          6: {
+            id: 6,
+            name: "Series A Purchase",
+            amount: 500,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+        },
+      },
+      false
+    );
+    server.use(...handlers);
+
+    render(
+      <Router>
+        <Routes>
+          <Route path="/dashboard/:mode" element={<Dashboard />} />
+        </Routes>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const addShareholderButton = await screen.findByRole("button", {
+      name: /add shareholder/i,
+    });
+    await userEvent.click(addShareholderButton);
+  
+    let newShareholderNameField = screen.getByRole("textbox");
+    let saveButton = screen.getByRole("button", { name: "Save" });
+    await waitFor(() => {
+      expect(newShareholderNameField).toBeVisible();
+    });
+    expect(saveButton).toBeDisabled();
+    await userEvent.click(saveButton);
+    expect(newShareholderNameField).toBeInTheDocument();
+  });
+
+  //Bug 12
+  it("should be logout button", async () => {
+    const Router = getTestRouter("/dashboard/investor");
+
+    const handlers = getHandlers(
+      {
+        company: { name: "My Company" },
+        shareholders: {
+          0: { name: "Tonya", grants: [1], group: "founder", id: 0 },
+          3: { name: "Timothy", grants: [6], group: "investor", id: 3 },
+        },
+        grants: {
+          1: {
+            id: 1,
+            name: "Initial Grant",
+            amount: 1000,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+          6: {
+            id: 6,
+            name: "Series A Purchase",
+            amount: 500,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+        },
+      },
+      false
+    );
+    server.use(...handlers);
+
+    render(
+      <Router>
+        <Routes>
+          <Route path="/dashboard/:mode" element={<Dashboard />} />
+        </Routes>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+    const history = createMemoryHistory();
+    const logoutButton = await screen.findByRole("button", {
+      name: /logout/i,
+    });
+    await userEvent.click(logoutButton);
+    expect(localStorage.getItem('session')).toBeNull();
+    expect(history.location.pathname).toBe('/');
+  });
 });
+

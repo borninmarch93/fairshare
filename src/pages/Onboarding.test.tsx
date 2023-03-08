@@ -1,4 +1,5 @@
 import React from "react";
+import { createMemoryHistory } from 'history';
 import { render, screen, waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import {
   CompanyStep,
@@ -258,5 +259,234 @@ describe("Onboarding", () => {
     expect(textIndicator).not.toBeInTheDocument();
   }, 10000);
 
-  it.todo("should persist onboard config");
+  //Bug 01
+  it("should not allow registering without email", async () => {
+    const Router = getTestRouter("/");
+    render(
+      <Router>
+        <Page />
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+    const nameField = screen.getByRole("textbox", { name: /who is setting/ });
+    await userEvent.click(nameField)
+    await userEvent.type(nameField, "Terry");
+    expect(nameField).toHaveValue("Terry");
+
+    const nextButton = screen.getByRole("button", { name: "Next" });
+    expect(nextButton).toBeDisabled();
+    await userEvent.click(nextButton);
+    expect(nameField).toBeInTheDocument();
+  });
+
+  //Bug 02
+  it("should not allow registering without company name", async () => {
+    const Router = getTestRouter("/start/company");
+    render(
+      <Router>
+        <Page initialState={{
+          ...defaultOnboardingState,
+            userName: 'Aaron',
+            email: 'myemail@gmail.com'
+        }} />
+        </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const companyNameField = screen.getByRole("textbox", {
+      name: /company are we/,
+    });
+    const nextButton = screen.getByRole("button", { name: "Next" });
+    expect(nextButton).toBeDisabled();
+    await userEvent.click(nextButton);
+    expect(companyNameField).toBeInTheDocument();
+  });
+
+  //Bug 03
+  it("should not allow adding shareholder without name", async () => {
+    const Router = getTestRouter("/start/shareholders");
+    render(
+      <Router>
+        <Page
+          initialState={{
+            ...defaultOnboardingState,
+            companyName: "My Company",
+            shareholders: {
+              "0": { name: "Jenn", group: "founder", grants: [], id: 0 },
+            },
+          }}
+        />
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const addShareholdersButton = screen.getByRole("button", {
+      name: "Add Shareholder",
+    });
+    await userEvent.click(addShareholdersButton);
+  
+    let newShareholderNameField = screen.getByRole("textbox");
+    let createButton = screen.getByRole("button", { name: "Create" });
+    await waitFor(() => {
+      expect(newShareholderNameField).toBeVisible();
+    });
+    expect(createButton).toBeDisabled();
+    await userEvent.click(createButton);
+    expect(newShareholderNameField).toBeInTheDocument();
+  });
+
+  //Bug 04
+  it("should not allow adding placeholder as type of shareholder", async () => {
+    const Router = getTestRouter("/start/shareholders");
+    render(
+      <Router>
+        <Page
+          initialState={{
+            ...defaultOnboardingState,
+            companyName: "My Company",
+            shareholders: {
+              "0": { name: "Jenn", group: "founder", grants: [], id: 0 },
+            },
+          }}
+        />
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+  
+    const addShareholdersButton = screen.getByRole("button", {
+      name: "Add Shareholder",
+    });
+    await userEvent.click(addShareholdersButton);
+  
+    let newShareholderNameField = screen.getByRole("textbox");
+    let defaultOption = screen.getByRole('option', { name: "Type of Shareholder" });
+    await waitFor(() => {
+      expect(newShareholderNameField).toBeVisible();
+    });
+  
+    expect(defaultOption).toBeDisabled();
+  });  
+
+  //Bug 05
+  it('should not access company step directly',  async () => {
+    const Router = getTestRouter("/start/company");
+    
+    render(
+      <Router>
+        <Page/>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const history = createMemoryHistory();
+    const companyNameField = screen.queryByRole("textbox", {
+      name: /company are we/,
+    });
+    expect(companyNameField).not.toBeInTheDocument();
+    expect(history.location.pathname).toBe('/');
+  });
+
+  //Bug 06
+  it('should not access add shareholders step directly',  async () => {
+    const Router = getTestRouter("/start/shareholders");
+    
+    render(
+      <Router>
+        <Page/>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const history = createMemoryHistory();
+    const addShareholdersButton = screen.queryByRole("button", {
+      name: "Add Shareholder",
+    });
+    expect(addShareholdersButton).not.toBeInTheDocument();
+    expect(history.location.pathname).toBe('/');
+  });
+
+  //Bug 07
+
+  //Bug 08
+  it('should not allow adding grant without name/amount/date',  async () => {
+    const Router = getTestRouter("/start/grants/0");
+    render(
+      <Router>
+        <Page
+          initialState={{
+            ...defaultOnboardingState,
+            shareholders: {
+              "0": { name: "Jenn", group: "founder", grants: [], id: 0 },
+            },
+          }}
+        />
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const addGrantButton = screen.getByRole("button", { name: /Add Grant/ });
+    await userEvent.click(addGrantButton);
+
+    let grantNameInput = screen.getByTestId("grant-name");
+    let grantAmountInput = screen.getByTestId("grant-amount");
+    let grantDateInput = screen.getByTestId("grant-issued");
+    const saveButton = screen.getByRole("button", { name: /Save/ });
+
+    await waitFor(() => {
+      expect(grantNameInput).toBeVisible();
+    });
+
+    // wo name
+    await userEvent.click(grantAmountInput);
+    await userEvent.paste("2000");
+    await userEvent.click(grantDateInput);
+    await userEvent.paste('2023-03-08');
+    expect(saveButton).toBeDisabled();
+    
+    // wo shares amount
+    await userEvent.click(grantNameInput);
+    await userEvent.paste("Anna");
+    await userEvent.click(grantAmountInput);
+    await userEvent.clear(grantAmountInput);
+    expect(saveButton).toBeDisabled();
+
+    // wo date
+    await userEvent.click(grantAmountInput);
+    await userEvent.paste("2000");
+    await userEvent.click(grantDateInput);
+    await userEvent.clear(grantDateInput);
+    expect(saveButton).toBeDisabled();
+  });
+
+  //Bug 09
+  it('should be able to add any number of shares',  async () => {
+    const Router = getTestRouter("/start/grants/0");
+    render(
+      <Router>
+        <Page
+          initialState={{
+            ...defaultOnboardingState,
+            shareholders: {
+              "0": { name: "Jenn", group: "founder", grants: [], id: 0 },
+            },
+          }}
+        />
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const addGrantButton = screen.getByRole("button", { name: /Add Grant/ });
+    await userEvent.click(addGrantButton);
+
+    let grantAmountInput = screen.getByTestId("grant-amount");
+    await waitFor(() => {
+      expect(grantAmountInput).toBeVisible();
+    });
+
+    await userEvent.click(grantAmountInput);
+    await userEvent.paste("5");
+
+    expect(grantAmountInput).toHaveValue("5");
+  });
+
 });
