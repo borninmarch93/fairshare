@@ -279,4 +279,28 @@ describe("Onboarding", () => {
     await userEvent.click(nextButton);
     expect(nameField).toBeInTheDocument();
   });
+
+  it("should not allow registering without company name", async () => {
+    const Router = getTestRouter("/start/company");
+    render(
+      <Router>
+        <Page initialState={{
+          ...defaultOnboardingState,
+            userName: 'Aaron',
+            email: 'myemail@gmail.com'
+        }} />
+        </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const companyNameField = screen.getByRole("textbox", {
+      name: /company are we/,
+    });
+    const nextButton = screen.getByRole("button", { name: "Next" });
+    expect(nextButton).toBeDisabled();
+    await userEvent.click(nextButton);
+    expect(companyNameField).toBeInTheDocument();
+  });
+
 });
+
