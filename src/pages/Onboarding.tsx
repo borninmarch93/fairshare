@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Route,
   Routes,
@@ -95,8 +95,14 @@ export function UserStep() {
 }
 
 export function CompanyStep() {
-  const { companyName, dispatch } = useContext(OnboardingContext);
+  const { companyName, userName, email, dispatch } = useContext(OnboardingContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!userName || !email) {
+      return navigate("/start/user");
+    }
+  }, [userName, email]);
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
