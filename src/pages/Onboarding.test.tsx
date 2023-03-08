@@ -259,8 +259,6 @@ describe("Onboarding", () => {
     expect(textIndicator).not.toBeInTheDocument();
   }, 10000);
 
-  it.todo("should persist onboard config");
-
   //Bug 01
   it("should not allow registering without email", async () => {
     const Router = getTestRouter("/");
@@ -405,6 +403,59 @@ describe("Onboarding", () => {
     });
     expect(addShareholdersButton).not.toBeInTheDocument();
     expect(history.location.pathname).toBe('/');
+  });
+
+  //Bug 07
+
+  //Bug 08
+  it('should not allow adding grant without name/amount/date',  async () => {
+    const Router = getTestRouter("/start/grants/0");
+    render(
+      <Router>
+        <Page
+          initialState={{
+            ...defaultOnboardingState,
+            shareholders: {
+              "0": { name: "Jenn", group: "founder", grants: [], id: 0 },
+            },
+          }}
+        />
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const addGrantButton = screen.getByRole("button", { name: /Add Grant/ });
+    await userEvent.click(addGrantButton);
+
+    let grantNameInput = screen.getByTestId("grant-name");
+    let grantAmountInput = screen.getByTestId("grant-amount");
+    let grantDateInput = screen.getByTestId("grant-issued");
+    const saveButton = screen.getByRole("button", { name: /Save/ });
+
+    await waitFor(() => {
+      expect(grantNameInput).toBeVisible();
+    });
+
+    // wo name
+    await userEvent.click(grantAmountInput);
+    await userEvent.paste("2000");
+    await userEvent.click(grantDateInput);
+    await userEvent.paste('2023-03-08');
+    expect(saveButton).toBeDisabled();
+    
+    // wo shares amount
+    await userEvent.click(grantNameInput);
+    await userEvent.paste("Anna");
+    await userEvent.click(grantAmountInput);
+    await userEvent.clear(grantAmountInput);
+    expect(saveButton).toBeDisabled();
+
+    // wo date
+    await userEvent.click(grantAmountInput);
+    await userEvent.paste("2000");
+    await userEvent.click(grantDateInput);
+    await userEvent.clear(grantDateInput);
+    expect(saveButton).toBeDisabled();
   });
 
 });
