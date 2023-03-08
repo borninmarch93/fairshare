@@ -302,5 +302,36 @@ describe("Onboarding", () => {
     expect(companyNameField).toBeInTheDocument();
   });
 
-});
+  it("should not allow adding shareholder without name", async () => {
+    const Router = getTestRouter("/start/shareholders");
+    render(
+      <Router>
+        <Page
+          initialState={{
+            ...defaultOnboardingState,
+            companyName: "My Company",
+            shareholders: {
+              "0": { name: "Jenn", group: "founder", grants: [], id: 0 },
+            },
+          }}
+        />
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
 
+    const addShareholdersButton = screen.getByRole("button", {
+      name: "Add Shareholder",
+    });
+    await userEvent.click(addShareholdersButton);
+  
+    let newShareholderNameField = screen.getByRole("textbox");
+    let createButton = screen.getByRole("button", { name: "Create" });
+    await waitFor(() => {
+      expect(newShareholderNameField).toBeVisible();
+    });
+    expect(createButton).toBeDisabled();
+    await userEvent.click(createButton);
+    expect(newShareholderNameField).toBeInTheDocument();
+  });
+
+});
