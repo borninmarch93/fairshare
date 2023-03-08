@@ -36,16 +36,16 @@ const Page = ({
       }}
     >
       <Routes>
-        <Route path="/" element={<Navigate to="user" replace={true} />} />
-        <Route path="user" element={<UserStep />} />
-        <Route path="company" element={<CompanyStep />} />
-        <Route path="shareholders" element={<ShareholdersStep />} />
+        <Route path="/" element={<Navigate to="start/user" replace={true} />} />
+        <Route path="/start/user" element={<UserStep />} />
+        <Route path="/start/company" element={<CompanyStep />} />
+        <Route path="/start/shareholders" element={<ShareholdersStep />} />
         <Route
-          path="grants"
-          element={<Navigate to={`/grants/0`} replace={true} />}
+          path="start/grants"
+          element={<Navigate to={`/start/grants/0`} replace={true} />}
         />
         <Route
-          path="grants/:shareholderID"
+          path="start/grants/:shareholderID"
           element={<ShareholderGrantsStep />}
         />
         <Route path="done" element={<div />} />
@@ -80,10 +80,14 @@ describe("Onboarding", () => {
   });
 
   it("should allow configuring company", async () => {
-    const Router = getTestRouter("/company");
+    const Router = getTestRouter("/start/company");
     render(
       <Router>
-        <Page />
+        <Page initialState={{
+            ...defaultOnboardingState,
+              userName: 'Aaron',
+              email: 'myemail@gmail.com'
+          }} />
       </Router>,
       { wrapper: ThemeWrapper }
     );
@@ -100,7 +104,7 @@ describe("Onboarding", () => {
   });
 
   it("should allow configuring shareholders", async () => {
-    const Router = getTestRouter("/shareholders");
+    const Router = getTestRouter("/start/shareholders");
     render(
       <Router>
         <Page
@@ -156,8 +160,8 @@ describe("Onboarding", () => {
   });
 
   it("should allow for configuring shareholder grants", async () => {
-    const Router = getTestRouter("/grants");
-    render(
+    const Router = getTestRouter("/start/grants");
+   render(
       <Router>
         <Page
           initialState={{
@@ -202,8 +206,8 @@ describe("Onboarding", () => {
     await userEvent.click(grantAmountInput);
     await userEvent.paste("2000");
     await userEvent.click(grantDateInput);
-    await userEvent.paste(Date.now().toLocaleString());
-
+    await userEvent.paste('2023-03-08');
+  
     const saveButton = screen.getByRole("button", { name: /Save/ });
     await userEvent.click(saveButton);
 
@@ -223,11 +227,12 @@ describe("Onboarding", () => {
     await userEvent.click(grantAmountInput);
     await userEvent.paste("100");
     await userEvent.click(grantDateInput);
-    await userEvent.paste(Date.now().toLocaleString());
+    await userEvent.paste('2023-03-08');
 
     await userEvent.click(saveButton);
 
     expect(screen.getByText("Options conversion")).toBeInTheDocument();
+    expect(screen.getByText('2023-03-08')).toBeInTheDocument();
 
     nextButton = screen.getByRole("link", { name: /Next/ });
     await userEvent.click(nextButton);
@@ -241,9 +246,8 @@ describe("Onboarding", () => {
     await userEvent.click(grantNameInput);
     await userEvent.paste("Series A Purchase");
     await userEvent.click(grantAmountInput);
-    // Something is wrong with this input *hint*
-    // userEvent.paste(grantAmountInput, '800')
-    await userEvent.click(grantNameInput);
+    await userEvent.paste('800')
+    await userEvent.click(grantDateInput);
     await userEvent.paste("12/12/2020");
 
     await userEvent.click(saveButton);
