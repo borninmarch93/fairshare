@@ -143,4 +143,56 @@ describe("ShareholderPage", () => {
       )
     ).toBeInTheDocument();
   });
+
+  it("should show the share type preferred for each grant on the shareholder page", async () => {
+    const Router = getTestRouter("/shareholder/0");
+    const handlers = getHandlers(
+      {
+        company: { name: "My Company" },
+        shareholders: {
+          0: { name: "Tonya", grants: [1, 2], group: "founder", id: 0 },
+        },
+        grants: {
+          1: {
+            id: 1,
+            name: "Initial Grant",
+            amount: 1000,
+            issued: "12/12/2012",
+            type: "preferred",
+          },
+          2: {
+            id: 2,
+            name: "Incentive Package 2020",
+            amount: 500,
+            issued: "12/12/2012",
+            type: "common",
+          },
+        },
+      },
+      false
+    );
+    server.use(...handlers);
+
+   render(
+    <Router>
+        <Routes>
+          <Route
+            path="/shareholder/:shareholderID"
+            element={<ShareholderPage />}
+          />
+        </Routes>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    await screen.findByRole("button", { name: /Add Grant/ });
+    const grantTable = screen.getAllByRole("rowgroup")[1];
+
+    expect(
+      await within(grantTable).findByText(
+        /preferred/i
+      )
+    ).toBeInTheDocument();
+  });
+
 });

@@ -150,7 +150,6 @@ export function Dashboard() {
       return getGroupData();
     }
     if (mode === 'shareType') {
-      console.log(getShareTypeData());
       return getShareTypeData();
     }
 
