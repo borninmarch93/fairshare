@@ -5,10 +5,10 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { getTestRouter, server, ThemeWrapper } from "../testutils";
-import { ShareholderPage } from "./Shareholder";
+import { getTestRouter, server, ThemeWrapper } from "../../testutils";
+import { ShareholderPage } from "../Shareholder";
 import { Route, Routes } from "react-router";
-import { getHandlers } from "../handlers";
+import { getHandlers } from "../../handlers";
 import userEvent from "@testing-library/user-event";
 
 describe("ShareholderPage", () => {

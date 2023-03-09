@@ -1,18 +1,16 @@
 import React from "react";
 import { createMemoryHistory } from 'history';
 import { render, screen, waitFor, waitForElementToBeRemoved } from "@testing-library/react";
-import {
-  CompanyStep,
-  OnboardingContext,
-  OnboardingFields,
-  ShareholderGrantsStep,
-  ShareholdersStep,
-  signupReducer,
-  UserStep,
-} from "./Onboarding";
 import { Navigate, Route, Routes } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
-import { getTestRouter, ThemeWrapper } from "../testutils";
+import { getTestRouter, ThemeWrapper } from "../../testutils";
+import UserStep from "../../modules/onboarding/components/UserStep";
+import CompanyStep from "../../modules/onboarding/components/CompanyStep";
+import ShareholdersStep from "../../modules/onboarding/components/ShareholdersStep";
+import ShareholderGrantsStep from "../../modules/onboarding/components/ShareholderGrantsStep";
+import { OnboardingContext } from "../../modules/onboarding/context/OnboardingContext";
+import { signupReducer } from "../../modules/onboarding/store";
+import { OnboardingFields } from "../../modules/onboarding/types";
 
 const defaultOnboardingState = {
   userName: "",
