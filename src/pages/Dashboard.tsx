@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import { VictoryPie } from "victory";
 import { Link, useParams } from "react-router-dom";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import {
@@ -63,7 +62,6 @@ export function Dashboard() {
         prev[curr.type] = curr.price
         return prev;
       }, { common: 0, preferred: 0 });
-    //TODO fix type
 
     return Object.values(grant?.data ?? {})
       .reduce((prev, curr) => {

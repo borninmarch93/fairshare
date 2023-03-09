@@ -1,14 +1,6 @@
 import produce from "immer";
 import { OnboardingFields, OnboardingAction } from "../types";
-
-//TODO move method to utils 
-// replace any
-const generateID = (items: any) => {
-  return Math.max(
-    0,
-    ...Object.keys(items).map((e) => parseInt(e, 10))
-  ) + 1;
-}
+import { generateID } from "../utils/storeUtils";
 
 export function signupReducer(
   state: OnboardingFields,

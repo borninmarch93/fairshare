@@ -1,5 +1,5 @@
 import { Modal, ModalContent, Stack, FormControl, Input, Select, Button, Text } from "@chakra-ui/react";
-import { Grant } from "../../../types";
+import { Grant, ShareType } from "../../../types";
 
 interface AddGrantModalProps {
     isOpen: boolean,
@@ -32,13 +32,12 @@ const AddGrantModal: React.FC<AddGrantModalProps> = ({ isOpen, onClose, onSubmit
                 }
               />
             </FormControl>
-            {/* TODO any type */}
             <FormControl>
               <Select 
               variant="flushed"
               value={value.type} 
               data-testid="grant-share-type" 
-              onChange={(e) => onChange({...value, type: e.target.value as any})}>
+              onChange={(e) => onChange({...value, type: e.target.value as ShareType})}>
                 <option disabled value="">Type of Shares</option>
                 <option value="common">Common</option>
                 <option value="preferred">Preferred</option>

@@ -1,7 +1,7 @@
 import { useDisclosure, Stack, StackDivider, Badge, Modal, ModalContent, Input, Select, Button, Text } from "@chakra-ui/react";
 import React, { useContext, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Shareholder } from "../../../types";
+import { Shareholder, ShareholderGroup } from "../../../types";
 import { OnboardingContext } from "../context/OnboardingContext";
 
 const ShareholdersStep = () => {
@@ -12,10 +12,9 @@ const ShareholdersStep = () => {
   >({ name: "", group: "employee" });
   const navigate = useNavigate();
 
-  //TODO: change this to share price step
   useEffect(() => {
     if (!companyName) {
-      return navigate("/start/company");
+      return navigate("/start/shares");
     }
   }, [companyName]);
 
@@ -29,7 +28,6 @@ const ShareholdersStep = () => {
   return (
     <Stack>
       <Text color="teal.400">
-        {/* TODO: redirect to previous step if company name isn't there*/}
         Who are <strong>{companyName}</strong>'s shareholders?
       </Text>
       <Stack divider={<StackDivider borderColor="teal-200" />}>
@@ -49,13 +47,12 @@ const ShareholdersStep = () => {
                   setNewShareholder((s) => ({ ...s, name: e.target.value }))
                 }
               />
-              {/* TODO: bad any */}
               <Select
                 value={newShareholder.group}
                 onChange={(e) =>
                   setNewShareholder((s) => ({
                     ...s,
-                    group: e.target.value as any,
+                    group: e.target.value as ShareholderGroup,
                   }))
                 }
               >
