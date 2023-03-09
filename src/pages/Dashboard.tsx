@@ -25,23 +25,26 @@ import {
   Stat,
   StatLabel,
   StatNumber,
+  Badge,
 } from "@chakra-ui/react";
 import { Grant, Share, Shareholder } from "../types";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import produce from "immer";
 import { AuthContext } from "../App";
+import UpdateShareModal from "../modules/shares/components/UpdateShareModal";
 
 export function Dashboard() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { onOpen: shareOnOpen, isOpen: isShareOpen, onClose: onShareClose } = useDisclosure();
+
   const queryClient = useQueryClient();
-  const [newShareholder, setNewShareholder] = React.useState<
-    Omit<Shareholder, "id" | "grants">
-  >({ name: "", group: "employee" });
+  const [newShareholder, setNewShareholder] = React.useState<Omit<Shareholder, "id" | "grants">>({ name: "", group: "employee" });
+  const [updatedShare, setUpdatedShare] = React.useState<Share>();
   const { mode } = useParams();
   const { deauthorize } = useContext(AuthContext);
 
-    // TODO: using this dictionary thing a lot... hmmm
-    const grant = useQuery<{ [dataID: number]: Grant }, string>("grants", () =>
+  // TODO: using this dictionary thing a lot... hmmm
+  const grant = useQuery<{ [dataID: number]: Grant }, string>("grants", () =>
     fetch("/grants").then((e) => e.json())
   );
   const shareholder = useQuery<{ [dataID: number]: Shareholder }>(
@@ -53,20 +56,67 @@ export function Dashboard() {
     () => fetch("/shares").then((e) => e.json())
   );
 
-  
   const calcMarketCap = () => {
     const sharePricesPerType = Object.values(shares?.data ?? {})
-    .reduce((prev, curr) => {
-      prev[curr.type] = curr.price
-      return prev;
-    }, { common: 0, preferred: 0 });
+      .reduce((prev, curr) => {
+        prev[curr.type] = curr.price
+        return prev;
+      }, { common: 0, preferred: 0 });
     //TODO fix type
 
     return Object.values(grant?.data ?? {})
-      .reduce((prev, curr) => { 
+      .reduce((prev, curr) => {
         return prev += curr.amount * sharePricesPerType[curr.type]
-      } , 0)
+      }, 0)
   }
+
+  const updateShareTypeValue = (id: number) => {
+    const foundShare = Object.values(shares?.data ?? {}).find(share => share.id === id);
+    if (foundShare) {
+      setUpdatedShare({...foundShare});
+    }
+    shareOnOpen();
+  }
+
+  const shareChangeHandler = (share: Share) => {
+    setUpdatedShare(share);
+  }
+
+  const shareMutation = useMutation<
+    Share,
+    unknown,
+    Share
+  >(
+    (share) =>
+      fetch("/share/update", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(share),
+      }).then((res) => res.json()),
+    {
+      onSuccess: (data) => {
+        queryClient.setQueryData<{ [id: number]: Share } | undefined>(
+          "shares",
+          (s) => {
+            if (s) {
+              return produce(s, (draft) => {
+                draft[data.id] = data;
+              });
+            }
+          }
+        );
+      },
+    }
+  );
+
+  async function updateShareHandler(e: React.FormEvent) {
+    e.preventDefault();
+    if (updatedShare) {
+      await shareMutation.mutateAsync(updatedShare);
+    }
+    onShareClose();
+  }
+
 
   const shareholderMutation = useMutation<
     Shareholder,
@@ -232,7 +282,7 @@ export function Dashboard() {
         data={getData()}
       />
       <Stack divider={<StackDivider />}>
-        <Heading>Shareholders</Heading>
+        <Heading size="md">Shareholders</Heading>
         <Table>
           <Thead>
             <Tr>
@@ -268,6 +318,7 @@ export function Dashboard() {
           </Tbody>
         </Table>
         <Button onClick={onOpen}>Add Shareholder</Button>
+
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalContent>
             <Stack p="10" as="form" onSubmit={submitNewShareholder}>
@@ -298,6 +349,39 @@ export function Dashboard() {
             </Stack>
           </ModalContent>
         </Modal>
+      </Stack>
+      <Stack>
+        <Heading as="h3" size='md'>Shares</Heading>
+        <Table>
+          <Thead>
+            <Tr>
+              <Td>Type</Td>
+              <Td>Price</Td>
+              <Td></Td>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {Object.values(shares?.data || {}).map((s) => (
+              <Tr key={s.id}>
+                <Td data-testid={`share-${s.type}`}><Badge>{s.type}</Badge></Td>
+                <Td data-testid={`share-${s.price}`}>
+                  ${s.price}
+                </Td>
+                <Td>
+                  <Button variant="link" data-share-id={4} onClick={() => updateShareTypeValue(s.id)}>Edit</Button>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+        {updatedShare &&
+          <UpdateShareModal
+            value={updatedShare}
+            onClose={onShareClose}
+            isOpen={isShareOpen}
+            onSubmit={updateShareHandler}
+            onChange={shareChangeHandler} />
+        }
       </Stack>
     </Stack>
   );

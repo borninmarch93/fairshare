@@ -65,9 +65,20 @@ export function getHandlers(
         price,
         id: nextID(shares),
       }
-
-      console.log('saving share', share, req.body)
       shares[share.id] = share;
+      
+      return res(ctx.json(share));
+    }),
+
+    rest.put<Share>("/share/update", (req, res, ctx) => {
+      const { id, type, price } = req.body;
+      const share: Share = {
+        id,
+        type,
+        price,
+      }
+      shares[share.id] = share;
+      
       return res(ctx.json(share));
     }),
 
