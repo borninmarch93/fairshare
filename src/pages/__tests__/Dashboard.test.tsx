@@ -6,10 +6,10 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { getTestRouter, server, ThemeWrapper } from "../testutils";
-import { Dashboard } from "./Dashboard";
+import { getTestRouter, server, ThemeWrapper } from "../../testutils";
+import { Dashboard } from "../Dashboard";
 import { Route, Routes } from "react-router";
-import { getHandlers } from "../handlers";
+import { getHandlers } from "../../handlers";
 import userEvent from "@testing-library/user-event";
 
 describe("Dashboard", () => {
@@ -352,7 +352,7 @@ describe("Dashboard", () => {
     expect(within(chart).getByText(/founder/)).toBeInTheDocument();
     expect(within(chart).getByText(/investor/)).toBeInTheDocument();
     expect(within(chart).queryByText(/employee/)).not.toBeInTheDocument();
-   
+
   });
 
   //Bug 11
@@ -400,7 +400,7 @@ describe("Dashboard", () => {
       name: /add shareholder/i,
     });
     await userEvent.click(addShareholderButton);
-  
+
     let newShareholderNameField = screen.getByRole("textbox");
     let saveButton = screen.getByRole("button", { name: "Save" });
     await waitFor(() => {
