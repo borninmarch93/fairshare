@@ -12,6 +12,7 @@ const ShareholdersStep = () => {
   >({ name: "", group: "employee" });
   const navigate = useNavigate();
 
+  //TODO: change this to share price step
   useEffect(() => {
     if (!companyName) {
       return navigate("/start/company");

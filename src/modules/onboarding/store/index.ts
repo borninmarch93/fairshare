@@ -1,6 +1,15 @@
 import produce from "immer";
 import { OnboardingFields, OnboardingAction } from "../types";
 
+//TODO move method to utils 
+// replace any
+const generateID = (items: any) => {
+  return Math.max(
+    0,
+    ...Object.keys(items).map((e) => parseInt(e, 10))
+  ) + 1;
+}
+
 export function signupReducer(
   state: OnboardingFields,
   action: OnboardingAction
@@ -23,15 +32,18 @@ export function signupReducer(
       case "updateEmail":
         draft.email = action.payload;
         break;
+      case "addShare":
+        const nextShareID = generateID(draft.shares);
+        draft.shares[nextShareID] = {
+          id: nextShareID,
+          ...action.payload,
+        };
+        break;
       case "updateCompany":
         draft.companyName = action.payload;
         break;
       case "addShareholder":
-        const nextShareholderID =
-          Math.max(
-            0,
-            ...Object.keys(draft.shareholders).map((e) => parseInt(e, 10))
-          ) + 1;
+        const nextShareholderID = generateID(draft.shareholders);
         draft.shareholders[nextShareholderID] = {
           id: nextShareholderID,
           grants: [],
@@ -39,11 +51,7 @@ export function signupReducer(
         };
         break;
       case "addGrant":
-        const nextGrantID =
-          Math.max(
-            0,
-            ...Object.keys(draft.grants).map((e) => parseInt(e, 10))
-          ) + 1;
+        const nextGrantID = generateID(draft.grants);
         draft.grants[nextGrantID] = {
           id: nextGrantID,
           ...action.payload.grant,

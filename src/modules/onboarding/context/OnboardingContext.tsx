@@ -10,4 +10,5 @@ export const OnboardingContext = React.createContext<
     shareholders: {},
     grants: {},
     dispatch: () => { },
+    shares: {},
 });

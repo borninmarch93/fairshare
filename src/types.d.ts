@@ -6,6 +6,11 @@ export interface User {
 export interface Company {
   name: string;
 }
+export interface Share {
+  id: number;
+  type: 'common' | 'preferred';
+  price: number;
+}
 export interface Grant {
   id: number;
   name: string;

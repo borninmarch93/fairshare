@@ -1,4 +1,4 @@
-import { Shareholder, Grant } from "../../types";
+import { Shareholder, Grant, Share } from "../../types";
 
 export interface OnboardingFields {
     companyName: string;
@@ -6,15 +6,20 @@ export interface OnboardingFields {
     email: string;
     shareholders: { [shareholderID: number]: Shareholder };
     grants: { [grantID: number]: Grant };
+    shares: {[shareID: number]: Share }
 }
 
 interface UpdateUserAction {
     type: "updateUser";
     payload: string;
 }
-interface UpdateEmail {
+interface UpdateEmailAction {
     type: "updateEmail";
     payload: string;
+}
+interface AddShareAction {
+    type: "addShare",
+    payload: Omit<Share, "id">,
 }
 interface UpdateCompanyAction {
     type: "updateCompany";
@@ -24,14 +29,15 @@ interface AddShareholderAction {
     type: "addShareholder";
     payload: Omit<Shareholder, "id" | "grants">;
 }
-interface AddGrant {
+interface AddGrantAction {
     type: "addGrant";
     payload: { shareholderID: number; grant: Omit<Grant, "id"> };
 }
 
 export type OnboardingAction =
     | UpdateUserAction
-    | UpdateEmail
+    | UpdateEmailAction
     | UpdateCompanyAction
+    | AddShareAction
     | AddShareholderAction
-    | AddGrant;
+    | AddGrantAction;
