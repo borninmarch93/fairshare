@@ -1,4 +1,4 @@
-import { useDisclosure, Stack, Table, Text, Thead, Tr, Th, Tbody, Td, Button, Modal, ModalContent, FormControl, Input } from "@chakra-ui/react";
+import { useDisclosure, Stack, Table, Text, Thead, Tr, Th, Tbody, Td, Button, Modal, ModalContent, FormControl, Input, Select } from "@chakra-ui/react";
 import React, { useContext, useEffect } from "react";
 import { useParams, Navigate, Link } from "react-router-dom";
 import { Grant } from "../../../types";
@@ -19,11 +19,6 @@ const ShareholderGrantsStep = () => {
   const nextLink = !shareholders[shareholder.id + 1]
     ? `/start/done`
     : `/start/grants/${shareholder.id + 1}`;
-
-
-  useEffect(() => {
-    console.log(nextLink);
-  }, [nextLink]);
 
   if (!shareholder) {
     return <Navigate to="/start/shareholders" replace={true} />;
@@ -95,6 +90,13 @@ const ShareholderGrantsStep = () => {
                   setDraftGrant((g) => ({ ...g, name: e.target.value }))
                 }
               />
+            </FormControl>
+            <FormControl>
+              <Select variant="flushed" value="" data-testId="grant-share-type" onChange={() => { }}>
+                <option disabled value="">Type of Shares</option>
+                <option value="common">Common</option>
+                <option value="preffered">Preffered</option>
+              </Select>
             </FormControl>
             <FormControl>
               <Input
