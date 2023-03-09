@@ -27,6 +27,7 @@ import { Grant, Shareholder } from "../types";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import produce from "immer";
 import { AuthContext } from "../App";
+import { DataType, DataTypes } from "../modules/dashboard/types";
 
 export function Dashboard() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -128,6 +129,35 @@ export function Dashboard() {
     onClose();
   }
 
+  const getShareTypeData = () => {
+    if (!shareholder.data || !grant.data) {
+      return [];
+    }
+
+    return ["common", "preferred"].map((shareType) => ({
+      x: shareType,
+      y: Object.values(grant?.data ?? {})
+        .filter((g) => g.type === shareType)
+        .map((g) => g.amount)
+        .reduce((acc, curr) => acc + curr, 0),
+    })).filter((s) => s.y > 0);
+  };
+
+  const getData = () => {
+    if (mode === 'investor') {
+      return getInvestorData();
+    }
+    if (mode === 'group') {
+      return getGroupData();
+    }
+    if (mode === 'shareType') {
+      console.log(getShareTypeData());
+      return getShareTypeData();
+    }
+
+    return [];
+  }
+
   return (
     <Stack>
       <Stack direction="row" justify="space-between" alignItems="baseline">
@@ -157,6 +187,15 @@ export function Dashboard() {
           >
             By Group
           </Button>
+          <Button
+            colorScheme="teal"
+            as={Link}
+            to="/dashboard/shareType"
+            variant="ghost"
+            isActive={mode === "shareType"}
+          >
+            By Share Type
+          </Button>
         </Stack>
         <Stack direction="row" justify="flex-end" >
           <Button colorScheme="teal" onClick={deauthorize}>
@@ -166,7 +205,7 @@ export function Dashboard() {
       </Stack>
       <VictoryPie
         colorScale="blue"
-        data={mode === "investor" ? getInvestorData() : getGroupData()}
+        data={getData()}
       />
       <Stack divider={<StackDivider />}>
         <Heading>Shareholders</Heading>

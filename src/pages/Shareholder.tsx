@@ -16,6 +16,7 @@ import {
   AlertTitle,
   AlertIcon,
   TableCaption,
+  Badge,
 } from "@chakra-ui/react";
 import { ReactComponent as Avatar } from "../assets/avatar-male.svg";
 import { Company, Grant, Shareholder } from "../types";
@@ -173,7 +174,7 @@ export function ShareholderPage() {
                   <Td>{name}</Td>
                   <Td>{new Date(issued).toLocaleDateString()}</Td>
                   <Td>{amount}</Td>
-                  <Td>{type}</Td>
+                  <Td><Badge>{type}</Badge></Td>
                   <Td></Td>
                 </Tr>
               );

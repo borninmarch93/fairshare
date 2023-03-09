@@ -41,7 +41,7 @@ const AddGrantModal: React.FC<AddGrantModalProps> = ({ isOpen, onClose, onSubmit
               onChange={(e) => onChange({...value, type: e.target.value as any})}>
                 <option disabled value="">Type of Shares</option>
                 <option value="common">Common</option>
-                <option value="preffered">Preffered</option>
+                <option value="preferred">Preferred</option>
               </Select>
             </FormControl>
             <FormControl>
