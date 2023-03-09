@@ -519,6 +519,50 @@ describe("Onboarding", () => {
 
     const addGrantButton = screen.getByRole("button", { name: /Add Grant/ });
     await userEvent.click(addGrantButton);
+    let grantTypeInput = screen.getByRole("combobox");
+
+    await waitFor(() => {
+      expect(grantTypeInput).toBeVisible();
+    });
+
+    await userEvent.selectOptions(grantTypeInput, "preferred");
+    expect(grantTypeInput).toBeInTheDocument();
+    let preferredOption = screen.getByRole('option', { name: "Preferred" });
+    expect(preferredOption.selected).toBe(true);
+  });
+
+  it("should show the share type for each grant on the shareholder page", async () => {
+    const Router = getTestRouter("/start/grants/0");
+   render(
+      <Router>
+        <Page
+          initialState={{
+            ...defaultOnboardingState,
+            companyName: "My Company",
+            shareholders: {
+              0: { name: "Jenn", group: "founder", grants: [1], id: 0 },
+              1: { name: "Aaron", group: "employee", grants: [2], id: 1 },
+            },
+            grants: {
+              1: {
+                id: 1,
+                name: "Initial issuance",
+                amount: 1000,
+                issued: Date.now().toLocaleString(),
+                type: "common",
+              },
+            },
+          }}
+        />
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    expect(screen.getByText(/Jenn/)).toBeInTheDocument();
+    expect(screen.getByText("Initial issuance")).toBeInTheDocument();
+
+    const addGrantButton = screen.getByRole("button", { name: /Add Grant/ });
+    await userEvent.click(addGrantButton);
 
     let grantNameInput = screen.getByTestId("grant-name");
     let grantAmountInput = screen.getByTestId("grant-amount");
@@ -536,6 +580,10 @@ describe("Onboarding", () => {
     await userEvent.paste("2000");
     await userEvent.click(grantDateInput);
     await userEvent.paste('2023-03-08');
+
+    const saveButton = screen.getByRole("button", { name: /Save/ });
+    await userEvent.click(saveButton);
+
     expect(grantTypeInput).toBeInTheDocument();
   });
 
