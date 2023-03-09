@@ -22,8 +22,11 @@ import {
   AlertTitle,
   AlertIcon,
   Select,
+  Stat,
+  StatLabel,
+  StatNumber,
 } from "@chakra-ui/react";
-import { Grant, Shareholder } from "../types";
+import { Grant, Share, Shareholder } from "../types";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import produce from "immer";
 import { AuthContext } from "../App";
@@ -36,6 +39,34 @@ export function Dashboard() {
   >({ name: "", group: "employee" });
   const { mode } = useParams();
   const { deauthorize } = useContext(AuthContext);
+
+    // TODO: using this dictionary thing a lot... hmmm
+    const grant = useQuery<{ [dataID: number]: Grant }, string>("grants", () =>
+    fetch("/grants").then((e) => e.json())
+  );
+  const shareholder = useQuery<{ [dataID: number]: Shareholder }>(
+    "shareholders",
+    () => fetch("/shareholders").then((e) => e.json())
+  );
+  const shares = useQuery<{ [dataID: number]: Share }>(
+    "shares",
+    () => fetch("/shares").then((e) => e.json())
+  );
+
+  
+  const calcMarketCap = () => {
+    const sharePricesPerType = Object.values(shares?.data ?? {})
+    .reduce((prev, curr) => {
+      prev[curr.type] = curr.price
+      return prev;
+    }, { common: 0, preferred: 0 });
+    //TODO fix type
+
+    return Object.values(grant?.data ?? {})
+      .reduce((prev, curr) => { 
+        return prev += curr.amount * sharePricesPerType[curr.type]
+      } , 0)
+  }
 
   const shareholderMutation = useMutation<
     Shareholder,
@@ -62,15 +93,6 @@ export function Dashboard() {
         );
       },
     }
-  );
-
-  // TODO: using this dictionary thing a lot... hmmm
-  const grant = useQuery<{ [dataID: number]: Grant }, string>("grants", () =>
-    fetch("/grants").then((e) => e.json())
-  );
-  const shareholder = useQuery<{ [dataID: number]: Shareholder }>(
-    "shareholders",
-    () => fetch("/shareholders").then((e) => e.json())
   );
 
   if (grant.status === "error") {
@@ -199,8 +221,12 @@ export function Dashboard() {
           <Button colorScheme="teal" onClick={deauthorize}>
             Logout
           </Button>
-        </Stack> 
+        </Stack>
       </Stack>
+      <Stat>
+        <StatLabel>Market Cap</StatLabel>
+        <StatNumber>${calcMarketCap().toLocaleString()}</StatNumber>
+      </Stat>
       <VictoryPie
         colorScale="blue"
         data={getData()}

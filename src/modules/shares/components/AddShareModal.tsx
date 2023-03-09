@@ -1,4 +1,4 @@
-import { Modal, ModalContent, Stack, FormControl, Input, Select, Button, Text } from "@chakra-ui/react";
+import { Modal, ModalContent, Stack, FormControl, Input, Select, Button } from "@chakra-ui/react";
 import { Share } from "../../../types";
 
 interface AddShareModalProps {

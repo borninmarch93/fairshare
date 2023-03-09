@@ -79,8 +79,6 @@ const SharePriceStep = () => {
       </Button>
     </Stack>
     )
-
-
 }
 
 export default SharePriceStep;
