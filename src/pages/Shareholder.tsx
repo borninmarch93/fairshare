@@ -5,16 +5,12 @@ import {
   Heading,
   Stack,
   Button,
-  Input,
   Table,
   Thead,
   Tr,
   Tbody,
   Td,
-  FormControl,
-  Modal,
   useDisclosure,
-  ModalContent,
   Spinner,
   Alert,
   AlertTitle,
@@ -25,6 +21,7 @@ import { ReactComponent as Avatar } from "../assets/avatar-male.svg";
 import { Company, Grant, Shareholder } from "../types";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import produce from "immer";
+import AddGrantModal from "../modules/shareholder/components/AddGrantModal";
 
 export function ShareholderPage() {
   const queryClient = useQueryClient();
@@ -111,6 +108,10 @@ export function ShareholderPage() {
     );
   }
 
+  const grantChangeHandler = (grant: Omit<Grant, "id">) => {
+    setDraftGrant(grant);
+  }
+
   const shareholder = shareholderQuery.data[parseInt(shareholderID)];
 
   return (
@@ -185,55 +186,13 @@ export function ShareholderPage() {
           </Button>
         </TableCaption>
       </Table>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalContent>
-          <Stack p="10" as="form" onSubmit={submitGrant}>
-            <Text>
-              A <strong>Grant</strong> is any occasion where new shares are
-              issued to a shareholder.
-            </Text>
-
-            <FormControl>
-              <Input
-                variant="flushed"
-                placeholder="Name"
-                data-testid="grant-name"
-                value={draftGrant.name}
-                onChange={(e) =>
-                  setDraftGrant((g) => ({ ...g, name: e.target.value }))
-                }
-              />
-            </FormControl>
-            <FormControl>
-              <Input
-                variant="flushed"
-                placeholder="Shares"
-                data-testid="grant-amount"
-                type="number"
-                value={draftGrant.amount || ""}
-                onChange={(e) =>
-                  setDraftGrant((g) => ({
-                    ...g,
-                    amount: parseInt(e.target.value, 10),
-                  }))
-                }
-              />
-            </FormControl>
-            <FormControl>
-              <Input
-                variant="flushed"
-                type="date"
-                data-testid="grant-issued"
-                value={draftGrant.issued}
-                onChange={(e) =>
-                  setDraftGrant((g) => ({ ...g, issued: e.target.value }))
-                }
-              />
-            </FormControl>
-            <Button type="submit">Save</Button>
-          </Stack>
-        </ModalContent>
-      </Modal>
+      <AddGrantModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={submitGrant}
+        value={draftGrant}
+        onChange={grantChangeHandler}
+      />
     </Stack>
   );
 }

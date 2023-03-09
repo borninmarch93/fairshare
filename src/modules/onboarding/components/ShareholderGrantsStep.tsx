@@ -1,7 +1,8 @@
 import { useDisclosure, Stack, Table, Text, Thead, Tr, Th, Tbody, Td, Button, Modal, ModalContent, FormControl, Input, Select, Badge } from "@chakra-ui/react";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { useParams, Navigate, Link } from "react-router-dom";
 import { Grant } from "../../../types";
+import AddGrantModal from "../../shareholder/components/AddGrantModal";
 import { OnboardingContext } from "../context/OnboardingContext";
 
 const ShareholderGrantsStep = () => {
@@ -24,7 +25,9 @@ const ShareholderGrantsStep = () => {
     return <Navigate to="/start/shareholders" replace={true} />;
   }
 
-  const isGrantValid = draftGrant.name.length && draftGrant.amount && draftGrant.issued;
+  const grantChangeHandler = (grant: Omit<Grant, "id">) => {
+    setDraftGrant(grant);
+  }
 
   function submitGrant(e: React.FormEvent) {
     e.preventDefault();
@@ -74,66 +77,13 @@ const ShareholderGrantsStep = () => {
       <Button variant="outline" onClick={onOpen}>
         Add Grant
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalContent>
-          <Stack p="10" as="form" onSubmit={submitGrant}>
-            <Text>
-              A <strong>Grant</strong> is any occasion where new shares are
-              issued to a shareholder.
-            </Text>
-
-            <FormControl>
-              <Input
-                variant="flushed"
-                placeholder="Name"
-                data-testid="grant-name"
-                value={draftGrant.name}
-                onChange={(e) =>
-                  setDraftGrant((g) => ({ ...g, name: e.target.value }))
-                }
-              />
-            </FormControl>
-            {/* TODO any type */}
-            <FormControl>
-              <Select 
-              variant="flushed"
-              value={draftGrant.type} 
-              data-testid="grant-share-type" 
-              onChange={(e) => setDraftGrant(draft => ({...draft, type: e.target.value as any}))}>
-                <option disabled value="">Type of Shares</option>
-                <option value="common">Common</option>
-                <option value="preffered">Preffered</option>
-              </Select>
-            </FormControl>
-            <FormControl>
-              <Input
-                variant="flushed"
-                placeholder="Shares"
-                data-testid="grant-amount"
-                value={draftGrant.amount || ""}
-                onChange={(e) =>
-                  setDraftGrant((g) => ({
-                    ...g,
-                    amount: parseInt(e.target.value),
-                  }))
-                }
-              />
-            </FormControl>
-            <FormControl>
-              <Input
-                variant="flushed"
-                type="date"
-                data-testid="grant-issued"
-                value={draftGrant.issued}
-                onChange={(e) =>
-                  setDraftGrant((g) => ({ ...g, issued: e.target.value }))
-                }
-              />
-            </FormControl>
-            <Button type="submit" isDisabled={!isGrantValid}>Save</Button>
-          </Stack>
-        </ModalContent>
-      </Modal>
+      <AddGrantModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={submitGrant}
+        value={draftGrant}
+        onChange={grantChangeHandler}
+      />
       <Button as={Link} to={nextLink} colorScheme="teal">
         Next
       </Button>
