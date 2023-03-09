@@ -1,4 +1,4 @@
-import { useDisclosure, Stack, Table, Text, Thead, Tr, Th, Tbody, Td, Button, Modal, ModalContent, FormControl, Input, Select } from "@chakra-ui/react";
+import { useDisclosure, Stack, Table, Text, Thead, Tr, Th, Tbody, Td, Button, Modal, ModalContent, FormControl, Input, Select, Badge } from "@chakra-ui/react";
 import React, { useContext, useEffect } from "react";
 import { useParams, Navigate, Link } from "react-router-dom";
 import { Grant } from "../../../types";
@@ -47,6 +47,7 @@ const ShareholderGrantsStep = () => {
         <Thead>
           <Tr>
             <Th>Occasion</Th>
+            <Th>Type</Th>
             <Th>Amount</Th>
             <Th>Date</Th>
             <Th></Th>
@@ -56,6 +57,7 @@ const ShareholderGrantsStep = () => {
           {shareholder.grants.map((gid) => (
             <Tr key={gid}>
               <Td>{grants[gid].name}</Td>
+              <Td><Badge>{grants[gid].type}</Badge></Td>
               <Td>{grants[gid].amount}</Td>
               <Td>{grants[gid].issued}</Td>
             </Tr>
@@ -91,8 +93,13 @@ const ShareholderGrantsStep = () => {
                 }
               />
             </FormControl>
+            {/* TODO any type */}
             <FormControl>
-              <Select variant="flushed" value="" data-testId="grant-share-type" onChange={() => { }}>
+              <Select 
+              variant="flushed"
+              value={draftGrant.type} 
+              data-testid="grant-share-type" 
+              onChange={(e) => setDraftGrant(draft => ({...draft, type: e.target.value as any}))}>
                 <option disabled value="">Type of Shares</option>
                 <option value="common">Common</option>
                 <option value="preffered">Preffered</option>
