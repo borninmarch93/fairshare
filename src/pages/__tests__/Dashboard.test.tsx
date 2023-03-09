@@ -459,5 +459,62 @@ describe("Dashboard", () => {
     expect(localStorage.getItem('session')).toBeNull();
     expect(history.location.pathname).toBe('/');
   });
+
+  it("should show share types in share type chart", async () => {
+    const Router = getTestRouter("/dashboard/investor");
+    const handlers = getHandlers(
+      {
+        company: { name: "My Company" },
+        shareholders: {
+          0: { name: "Tonya", grants: [1, 2], group: "founder", id: 0 },
+          3: { name: "Timothy", grants: [6], group: "investor", id: 3 },
+        },
+        grants: {
+          1: {
+            id: 1,
+            name: "Initial Grant",
+            amount: 1000,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+          2: {
+            id: 2,
+            name: "Incentive Package 2020",
+            amount: 500,
+            issued: Date.now().toLocaleString(),
+            type: "preferred",
+          },
+          6: {
+            id: 6,
+            name: "Series A Purchase",
+            amount: 500,
+            issued: Date.now().toLocaleString(),
+            type: "preferred",
+          },
+        },
+      },
+      false
+    );
+    server.use(...handlers);
+
+    render(
+      <Router>
+        <Routes>
+          <Route path="/dashboard/:mode" element={<Dashboard />} />
+        </Routes>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const shareTypeChartButton = await screen.findByRole("link", {
+      name: /by share type/i,
+    });
+    await userEvent.click(shareTypeChartButton);
+
+    const chart = await screen.findByRole("img");
+    expect(within(chart).getByText(/preferred/)).toBeInTheDocument();
+    expect(within(chart).getByText(/common/)).toBeInTheDocument();
+  });
+
 });
 
