@@ -9,7 +9,9 @@ import { QueryClient, QueryClientProvider } from "react-query";
 
 if (process.env.NODE_ENV !== "test") {
   const { worker } = require("./backend");
-  worker.start();
+  worker.start({
+    onUnhandledRequest: 'bypass'
+  });
 }
 
 const queryClient = new QueryClient();
