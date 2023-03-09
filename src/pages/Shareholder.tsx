@@ -19,27 +19,30 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { ReactComponent as Avatar } from "../assets/avatar-male.svg";
-import { Company, Grant, Shareholder } from "../types";
+import { Grant, Share, Shareholder } from "../types";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import produce from "immer";
 import AddGrantModal from "../modules/shareholder/components/AddGrantModal";
+import { getGrantsWithEquity, getSharePricesPerType } from "../modules/dashboard/utils/utils";
 
 export function ShareholderPage() {
   const queryClient = useQueryClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { shareholderID = ''} = useParams();
-  const grantQuery = useQuery<{ [dataID: number]: Grant }>("grants", () =>
+  const { shareholderID = '' } = useParams();
+  const grants = useQuery<{ [dataID: number]: Grant }>("grants", () =>
     fetch("/grants").then((e) => e.json())
   );
-  const shareholderQuery = useQuery<{ [dataID: number]: Shareholder }>(
+
+  const shareholders = useQuery<{ [dataID: number]: Shareholder }>(
     "shareholders",
     () => fetch("/shareholders").then((e) => e.json())
   );
-  // This is needed by candidates, and put here early so candidates don't get caught up on react-query
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const companyQuery = useQuery<Company>("company", () =>
-    fetch("/company").then((e) => e.json())
+
+  const shares = useQuery<{ [dataID: number]: Share }>(
+    "shares",
+    () => fetch("/shares").then((e) => e.json())
   );
+  const grantsWithEquity = getGrantsWithEquity(shares.data, grants.data);
 
   const [draftGrant, setDraftGrant] = React.useState<Omit<Grant, "id">>({
     name: "",
@@ -47,6 +50,7 @@ export function ShareholderPage() {
     issued: "",
     type: "common",
   });
+
   const grantMutation = useMutation<Grant, unknown, Omit<Grant, "id">>(
     (grant) =>
       fetch("/grant/new", {
@@ -95,16 +99,16 @@ export function ShareholderPage() {
   }
 
   if (
-    grantQuery.status !== "success" ||
-    shareholderQuery.status !== "success"
+    grants.status !== "success" ||
+    shareholders.status !== "success"
   ) {
     return <Spinner />;
   }
-  if (!grantQuery.data || !shareholderQuery.data) {
+  if (!grants.data || !shareholders.data) {
     return (
       <Alert status="error">
         <AlertIcon />
-        <AlertTitle>Error: {grantQuery.error}</AlertTitle>
+        <AlertTitle>Error: {grants.error}</AlertTitle>
       </Alert>
     );
   }
@@ -113,7 +117,14 @@ export function ShareholderPage() {
     setDraftGrant(grant);
   }
 
-  const shareholder = shareholderQuery.data[parseInt(shareholderID)];
+  const shareholder = shareholders.data[parseInt(shareholderID)];
+
+  const getTotalEquity = () => {
+    const grantIds = shareholders.data[parseInt(shareholderID, 10)].grants
+    return grantIds.map(grantId => grantsWithEquity[grantId]).reduce((prev, curr) => {
+      return prev + curr.equity;
+    }, 0);
+  }
 
   return (
     <Stack>
@@ -144,11 +155,17 @@ export function ShareholderPage() {
           <Text fontSize="sm" fontWeight="thin">
             <strong data-testid="shares-granted">
               {shareholder.grants.reduce(
-                (acc, grantID) => acc + grantQuery.data[grantID].amount,
+                (acc, grantID) => acc + grants.data[grantID].amount,
                 0
               )}
             </strong>{" "}
             shares
+          </Text>
+          <Text fontSize="sm" fontWeight="thin">
+            <strong data-testid="shares-equity">
+              ${getTotalEquity().toLocaleString()}
+            </strong>{" "}
+            equity
           </Text>
         </Stack>
       </Stack>
@@ -166,16 +183,16 @@ export function ShareholderPage() {
           </Tr>
         </Thead>
         <Tbody role="rowgroup">
-          {shareholderQuery.data[parseInt(shareholderID, 10)].grants.map(
+          {shareholders.data[parseInt(shareholderID, 10)].grants.map(
             (grantID) => {
-              const { name, issued, amount, type } = grantQuery.data[grantID];
+              const { name, issued, amount, type, equity } = grantsWithEquity[grantID];
               return (
                 <Tr key={grantID}>
                   <Td>{name}</Td>
                   <Td>{new Date(issued).toLocaleDateString()}</Td>
                   <Td>{amount}</Td>
                   <Td><Badge>{type}</Badge></Td>
-                  <Td></Td>
+                  <Td>${equity?.toLocaleString()}</Td>
                 </Tr>
               );
             }
