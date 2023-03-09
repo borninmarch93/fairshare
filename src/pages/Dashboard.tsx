@@ -27,7 +27,6 @@ import { Grant, Shareholder } from "../types";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import produce from "immer";
 import { AuthContext } from "../App";
-import { DataType, DataTypes } from "../modules/dashboard/types";
 
 export function Dashboard() {
   const { isOpen, onOpen, onClose } = useDisclosure();
