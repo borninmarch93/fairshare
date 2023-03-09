@@ -1,5 +1,5 @@
 import { rest } from "msw";
-import { Company, User, Shareholder, Grant } from "./types";
+import { Company, User, Shareholder, Grant, Share } from "./types";
 
 function nextID(collection: { [key: number]: unknown }) {
   return (
@@ -16,16 +16,18 @@ export function getHandlers(
     users?: { [email: string]: User };
     shareholders?: { [id: number]: Shareholder };
     grants?: { [id: number]: Grant };
+    shares?: {[id: number]: Share };
   } = {},
   persist: boolean = false
 ) {
-  let { company, users = {}, shareholders = {}, grants = {} } = params;
+  let { company, users = {}, shareholders = {}, grants = {}, shares = {} } = params;
   if (persist) {
     storeState({
       shareholders,
       users,
       grants,
       company,
+      shares,
     });
     setInterval(() => {
       if (localStorage.getItem("data")) {
@@ -34,6 +36,7 @@ export function getHandlers(
           users,
           grants,
           company,
+          shares,
         });
       }
     }, 5000);
@@ -53,6 +56,19 @@ export function getHandlers(
     rest.post<Company, Company>("/company/new", (req, res, ctx) => {
       company = req.body;
       return res(ctx.json(company));
+    }),
+
+    rest.post<Omit<Share, "id">>("/share/new", (req, res, ctx) => {
+      const { type, price } = req.body;
+      const share: Share = {
+        type,
+        price,
+        id: nextID(shares),
+      }
+
+      console.log('saving share', share, req.body)
+      shares[share.id] = share;
+      return res(ctx.json(share));
     }),
 
     rest.post<Omit<Shareholder, "id">>(
@@ -123,6 +139,10 @@ export function getHandlers(
 
     rest.get("/shareholders", (req, res, ctx) => {
       return res(ctx.json(shareholders));
+    }),
+
+    rest.get("/shares", (req, res, ctx) => {
+      return res(ctx.json(shares));
     }),
 
     rest.get("/company", (req, res, ctx) => {

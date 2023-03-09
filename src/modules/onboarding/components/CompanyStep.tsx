@@ -15,7 +15,7 @@ const CompanyStep = () => {
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    navigate("/start/shareholders");
+    navigate("/start/shares");
   }
 
   return (

@@ -15,6 +15,7 @@ import ShareholderGrantsStep from "../modules/onboarding/components/ShareholderG
 import DoneStep from "../modules/onboarding/components/DoneStep";
 import { signupReducer } from "../modules/onboarding/store";
 import { OnboardingContext } from "../modules/onboarding/context/OnboardingContext";
+import SharePriceStep from "../modules/onboarding/components/SharePriceStep";
 
 export function Start() {
   const [state, dispatch] = React.useReducer(signupReducer, {
@@ -23,6 +24,7 @@ export function Start() {
     companyName: "",
     shareholders: {},
     grants: {},
+    shares: {},
   });
 
   return (
@@ -34,6 +36,7 @@ export function Start() {
         <Routes>
           <Route path="/" element={<Navigate to="user" replace={true} />} />
           <Route path="user" element={<UserStep />} />
+          <Route path="shares" element={<SharePriceStep />} />
           <Route path="company" element={<CompanyStep />} />
           <Route path="shareholders" element={<ShareholdersStep />} />
           <Route

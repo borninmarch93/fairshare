@@ -3,15 +3,23 @@ import React, { useContext } from "react";
 import { useQueryClient, useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../App";
-import { Grant, Shareholder, User, Company } from "../../../types";
+import { Grant, Shareholder, User, Company, Share } from "../../../types";
 import { OnboardingContext } from "../context/OnboardingContext";
 
 const DoneStep = () => {
   const { authorize } = useContext(AuthContext);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { email, userName, companyName, shareholders, grants } =
+  const { email, userName, companyName, shareholders, grants, shares } =
     useContext(OnboardingContext);
+
+  const shareMutation = useMutation<Share, unknown, Share>((share) =>
+    fetch("/share/new", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(share),
+    }).then((res) => res.json())
+  );
 
   const grantMutation = useMutation<Grant, unknown, Grant>((grant) =>
     fetch("/grant/new", {
@@ -55,6 +63,7 @@ const DoneStep = () => {
         ...Object.values(grants).map((grant) =>
           grantMutation.mutateAsync(grant)
         ),
+        ...Object.values(shares).map((share) => shareMutation.mutateAsync(share)),
         ...Object.values(shareholders).map((shareholder) =>
           shareholderMutation.mutateAsync(shareholder)
         ),
