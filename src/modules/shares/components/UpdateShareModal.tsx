@@ -11,7 +11,6 @@ interface UpdateShareModalProps {
 
 const UpdateShareModal: React.FC<UpdateShareModalProps> = ({ isOpen, onClose, onSubmit, value, onChange }) => {
     const isShareValid = value?.type && value?.price;
-    console.log('value', value?.price);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -20,7 +19,7 @@ const UpdateShareModal: React.FC<UpdateShareModalProps> = ({ isOpen, onClose, on
             {/* TODO any type */}
             <FormControl>
               <Select 
-              isReadOnly
+              isDisabled
               variant="flushed"
               value={value?.type} 
               data-testid="share-type" 

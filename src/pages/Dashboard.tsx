@@ -32,6 +32,7 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import produce from "immer";
 import { AuthContext } from "../App";
 import UpdateShareModal from "../modules/shares/components/UpdateShareModal";
+import Chart from "../modules/dashboard/components/Chart";
 
 export function Dashboard() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -165,68 +166,12 @@ export function Dashboard() {
     );
   }
 
-  // TODO: why are these inline?
-  function getGroupData() {
-    if (!shareholder.data || !grant.data) {
-      return [];
-    }
-    return ["investor", "founder", "employee"].map((group) => ({
-      x: group,
-      y: Object.values(shareholder?.data ?? {})
-        .filter((s) => s.group === group)
-        .flatMap((s) => s.grants)
-        .reduce((acc, grantID) => acc + grant.data[grantID].amount, 0),
-    })).filter((group) => group.y > 0);
-  }
-
-  function getInvestorData() {
-    if (!shareholder.data || !grant.data) {
-      return [];
-    }
-    return Object.values(shareholder.data)
-      .map((s) => ({
-        x: s.name,
-        y: s.grants.reduce(
-          (acc, grantID) => acc + grant.data[grantID].amount,
-          0
-        ),
-      }))
-      .filter((e) => e.y > 0);
-  }
-
   async function submitNewShareholder(e: React.FormEvent) {
     e.preventDefault();
     await shareholderMutation.mutateAsync(newShareholder);
     onClose();
   }
 
-  const getShareTypeData = () => {
-    if (!shareholder.data || !grant.data) {
-      return [];
-    }
-
-    return ["common", "preferred"].map((shareType) => ({
-      x: shareType,
-      y: Object.values(grant?.data ?? {})
-        .filter((g) => g.type === shareType)
-        .map((g) => g.amount)
-        .reduce((acc, curr) => acc + curr, 0),
-    })).filter((s) => s.y > 0);
-  };
-
-  const getData = () => {
-    if (mode === 'investor') {
-      return getInvestorData();
-    }
-    if (mode === 'group') {
-      return getGroupData();
-    }
-    if (mode === 'shareType') {
-      return getShareTypeData();
-    }
-
-    return [];
-  }
 
   return (
     <Stack>
@@ -277,10 +222,11 @@ export function Dashboard() {
         <StatLabel>Market Cap</StatLabel>
         <StatNumber>${calcMarketCap().toLocaleString()}</StatNumber>
       </Stat>
-      <VictoryPie
-        colorScale="blue"
-        data={getData()}
-      />
+      <Chart 
+        groupBy={mode} 
+        shareholder={shareholder.data} 
+        grant={grant.data} 
+        shares={shares.data} />
       <Stack divider={<StackDivider />}>
         <Heading size="md">Shareholders</Heading>
         <Table>
