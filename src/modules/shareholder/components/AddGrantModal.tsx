@@ -1,5 +1,5 @@
 import { Modal, ModalContent, Stack, FormControl, Input, Select, Button, Text } from "@chakra-ui/react";
-import { Grant } from "../../../types";
+import { Grant, ShareType } from "../../../types";
 
 interface AddGrantModalProps {
     isOpen: boolean,
@@ -7,9 +7,15 @@ interface AddGrantModalProps {
     onSubmit: (e: React.FormEvent) => void,
     value: Omit<Grant, "id">,
     onChange: (grant: Omit<Grant, "id">) => void,
+    availableTypes: ShareType[]
 }
 
-const AddGrantModal: React.FC<AddGrantModalProps> = ({ isOpen, onClose, onSubmit, value, onChange }) => {
+const shareTypeLabels = {
+  "common": "Common",
+  "preferred": "Preferred"
+}
+
+const AddGrantModal: React.FC<AddGrantModalProps> = ({ isOpen, onClose, onSubmit, value, onChange, availableTypes }) => {
     const isGrantValid = value.name.length && value.amount && value.issued;
 
     return (
@@ -32,16 +38,16 @@ const AddGrantModal: React.FC<AddGrantModalProps> = ({ isOpen, onClose, onSubmit
                 }
               />
             </FormControl>
-            {/* TODO any type */}
             <FormControl>
               <Select 
               variant="flushed"
               value={value.type} 
               data-testid="grant-share-type" 
-              onChange={(e) => onChange({...value, type: e.target.value as any})}>
+              onChange={(e) => onChange({...value, type: e.target.value as ShareType})}>
                 <option disabled value="">Type of Shares</option>
-                <option value="common">Common</option>
-                <option value="preferred">Preferred</option>
+                {availableTypes.map(availableType => <option key={availableType} value={availableType}>
+                {shareTypeLabels[availableType]}
+              </option>)}
               </Select>
             </FormControl>
             <FormControl>
@@ -64,7 +70,7 @@ const AddGrantModal: React.FC<AddGrantModalProps> = ({ isOpen, onClose, onSubmit
                 onChange={(e) => onChange({ ...value, issued: e.target.value})}
               />
             </FormControl>
-            <Button type="submit" isDisabled={!isGrantValid}>Save</Button>
+            <Button type="submit" colorScheme="teal" isDisabled={!isGrantValid}>Save</Button>
           </Stack>
         </ModalContent>
       </Modal>

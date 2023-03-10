@@ -1,7 +1,8 @@
-import { Stack, Spinner, Text } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import { Stack, Spinner, Text, Alert, AlertDescription, AlertIcon, AlertTitle } from "@chakra-ui/react";
+import React, { useContext, useState } from "react";
 import { useQueryClient, useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { postShare } from "../../../apis/shares";
 import { AuthContext } from "../../../App";
 import { Grant, Shareholder, User, Company, Share } from "../../../types";
 import { OnboardingContext } from "../context/OnboardingContext";
@@ -12,14 +13,9 @@ const DoneStep = () => {
   const navigate = useNavigate();
   const { email, userName, companyName, shareholders, grants, shares } =
     useContext(OnboardingContext);
+  const [error, setError] = useState(false);
 
-  const shareMutation = useMutation<Share, unknown, Share>((share) =>
-    fetch("/share/new", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(share),
-    }).then((res) => res.json())
-  );
+  const shareMutation = useMutation<Share, unknown, Share>(postShare);
 
   const grantMutation = useMutation<Grant, unknown, Grant>((grant) =>
     fetch("/grant/new", {
@@ -58,23 +54,24 @@ const DoneStep = () => {
 
   React.useEffect(() => {
     async function saveData() {
-      const user = await userMutation.mutateAsync({ email, name: userName });
-      await Promise.all([
-        ...Object.values(grants).map((grant) =>
-          grantMutation.mutateAsync(grant)
-        ),
-        ...Object.values(shares).map((share) => shareMutation.mutateAsync(share)),
-        ...Object.values(shareholders).map((shareholder) =>
-          shareholderMutation.mutateAsync(shareholder)
-        ),
-        companyMutation.mutateAsync({ name: companyName }),
-      ]);
+      try {
+        const user = await userMutation.mutateAsync({ email, name: userName });
 
-      if (user) {
+        await Promise.all([
+          ...Object.values(grants).map((grant) =>
+            grantMutation.mutateAsync(grant)
+          ),
+          ...Object.values(shares).map((share) => shareMutation.mutateAsync(share)),
+          ...Object.values(shareholders).map((shareholder) =>
+            shareholderMutation.mutateAsync(shareholder)
+          ),
+          companyMutation.mutateAsync({ name: companyName }),
+        ])
+
         authorize(user);
         navigate("/dashboard");
-      } else {
-        // Something bad happened.
+      } catch (err) {
+        setError(true);
       }
     }
 
@@ -84,8 +81,15 @@ const DoneStep = () => {
 
   return (
     <Stack alignItems="center">
-      <Spinner />
-      <Text color="teal.400">...Wrapping up</Text>
+      {!error ? <>
+        <Spinner />
+        <Text color="teal.400">...Wrapping up</Text>
+      </> :
+        <Alert status='error'>
+          <AlertIcon />
+          <AlertTitle>Registration is not completed!</AlertTitle>
+          <AlertDescription>Please try again later.</AlertDescription>
+        </Alert>}
     </Stack>
   );
 };

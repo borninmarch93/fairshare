@@ -195,4 +195,62 @@ describe("ShareholderPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("should show the grant and shareholder equity", async () => {
+    const Router = getTestRouter("/shareholder/0");
+    const handlers = getHandlers(
+      {
+        company: { name: "My Company" },
+        shareholders: {
+          0: { name: "Tonya", grants: [1, 2], group: "founder", id: 0 },
+        },
+        grants: {
+          1: {
+            id: 1,
+            name: "Initial Grant",
+            amount: 1000,
+            issued: "12/12/2012",
+            type: "preferred",
+          },
+          2: {
+            id: 2,
+            name: "Incentive Package 2020",
+            amount: 500,
+            issued: "12/12/2012",
+            type: "common",
+          },
+        },
+        shares: {
+          1: {
+            type: "common",
+            price: 3,
+            id: 1
+          },
+          2: {
+            type: "preferred",
+            price: 5,
+            id: 2
+          },
+        },
+      },
+      false
+    );
+    server.use(...handlers);
+
+   render(
+    <Router>
+        <Routes>
+          <Route
+            path="/shareholder/:shareholderID"
+            element={<ShareholderPage />}
+          />
+        </Routes>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const preferredGrant = await screen.findByTestId('grant-1-equity');
+    expect(preferredGrant).toHaveTextContent('$5,000');
+    const commonGrant = await screen.findByTestId('grant-2-equity');
+    expect(commonGrant).toHaveTextContent('$1,500');
+  });
 });

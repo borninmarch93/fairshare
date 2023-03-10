@@ -6,7 +6,7 @@ import AddGrantModal from "../../shareholder/components/AddGrantModal";
 import { OnboardingContext } from "../context/OnboardingContext";
 
 const ShareholderGrantsStep = () => {
-  const { shareholders, grants, dispatch } = useContext(OnboardingContext);
+  const { shareholders, grants, shares, dispatch } = useContext(OnboardingContext);
   const { shareholderID = '' } = useParams();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const shareholder = shareholders[parseInt(shareholderID, 10)];
@@ -41,6 +41,11 @@ const ShareholderGrantsStep = () => {
     onClose();
     setDraftGrant({ name: "", amount: 0, issued: "", type: "common" });
   }
+
+  const getAvailableTypes = () => {
+    return Object.values(shares).map(share => share.type);
+  }
+
   return (
     <Stack>
       <Text color="teal-400">
@@ -83,6 +88,7 @@ const ShareholderGrantsStep = () => {
         onSubmit={submitGrant}
         value={draftGrant}
         onChange={grantChangeHandler}
+        availableTypes={getAvailableTypes()}
       />
       <Button as={Link} to={nextLink} colorScheme="teal">
         Next

@@ -24,6 +24,7 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import produce from "immer";
 import AddGrantModal from "../modules/shareholder/components/AddGrantModal";
 import { getGrantsWithEquity, getSharePricesPerType } from "../modules/dashboard/utils/utils";
+import { postGrant } from "../apis/grant";
 
 export function ShareholderPage() {
   const queryClient = useQueryClient();
@@ -42,6 +43,8 @@ export function ShareholderPage() {
     "shares",
     () => fetch("/shares").then((e) => e.json())
   );
+  const availableTypes = Object.values(shares.data ?? {}).map(share => share.type);
+
   const grantsWithEquity = getGrantsWithEquity(shares.data, grants.data);
 
   const [draftGrant, setDraftGrant] = React.useState<Omit<Grant, "id">>({
@@ -52,15 +55,7 @@ export function ShareholderPage() {
   });
 
   const grantMutation = useMutation<Grant, unknown, Omit<Grant, "id">>(
-    (grant) =>
-      fetch("/grant/new", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shareholderID: parseInt(shareholderID, 10),
-          grant,
-        }),
-      }).then((res) => res.json()),
+    (grant) => postGrant(grant, shareholderID),
     {
       onSuccess: (data) => {
         // this doesn't seem to triggering an instant re-render on consumers even though thats that it should ...
@@ -83,7 +78,7 @@ export function ShareholderPage() {
               });
             }
           }
-        );
+        ); 
       },
     }
   );
@@ -141,7 +136,7 @@ export function ShareholderPage() {
         Shareholder
       </Heading>
       <Stack direction="row" spacing="8">
-        <Avatar width="100px" height="auto" />
+        <Avatar width="100px" height="100%" />
         <Stack>
           <Text fontSize="xl" fontWeight="bold">
             {shareholder.name}
@@ -192,7 +187,7 @@ export function ShareholderPage() {
                   <Td>{new Date(issued).toLocaleDateString()}</Td>
                   <Td>{amount}</Td>
                   <Td><Badge>{type}</Badge></Td>
-                  <Td>${equity?.toLocaleString()}</Td>
+                  <Td data-testid={`grant-${grantID}-equity`}>${equity?.toLocaleString()}</Td>
                 </Tr>
               );
             }
@@ -210,6 +205,7 @@ export function ShareholderPage() {
         onSubmit={submitGrant}
         value={draftGrant}
         onChange={grantChangeHandler}
+        availableTypes={availableTypes}
       />
     </Stack>
   );

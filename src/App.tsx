@@ -47,7 +47,7 @@ function App() {
         deauthorize: logoutUser,
       }}
     >
-        <Container paddingTop="16" paddingBottom="16">
+        <Container paddingTop="6" paddingBottom="16">
           <Routes>
             {user ? (
               <>
