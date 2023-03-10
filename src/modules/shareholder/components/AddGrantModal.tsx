@@ -70,7 +70,7 @@ const AddGrantModal: React.FC<AddGrantModalProps> = ({ isOpen, onClose, onSubmit
                 onChange={(e) => onChange({ ...value, issued: e.target.value})}
               />
             </FormControl>
-            <Button type="submit" isDisabled={!isGrantValid}>Save</Button>
+            <Button type="submit" colorScheme="teal" isDisabled={!isGrantValid}>Save</Button>
           </Stack>
         </ModalContent>
       </Modal>

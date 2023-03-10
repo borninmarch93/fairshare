@@ -47,7 +47,7 @@ const UpdateShareModal: React.FC<UpdateShareModalProps> = ({ isOpen, onClose, on
               />
             </InputGroup>
           </FormControl>
-          <Button type="submit" isDisabled={!isShareValid}>Save</Button>
+          <Button type="submit" colorScheme="teal" isDisabled={!isShareValid}>Save</Button>
         </Stack>
       </ModalContent>
     </Modal>
