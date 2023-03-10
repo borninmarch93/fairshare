@@ -3,11 +3,6 @@ import { useMemo } from "react";
 import { VictoryPie } from "victory";
 import { Shareholder, Grant, Share } from "../../../types";
 import useData from "../hooks/useData";
-
-interface GrantWithEquity extends Grant {
-    equity: number
-}
-
 interface ChartProps {
     groupBy?: string,
     shareholder: { [dataID: number]: Shareholder },
@@ -16,7 +11,6 @@ interface ChartProps {
 }
 
 const Chart: React.FC<ChartProps> = ({ groupBy = 'investor', shareholder = {}, grant = {}, shares = {} }) => {
-    
     const { getGroupData, getInvestorData, getShareTypeData } = useData(shareholder, grant, shares);
 
     const getData = (metric: "amount" | "equity") => {

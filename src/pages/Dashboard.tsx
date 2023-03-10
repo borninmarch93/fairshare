@@ -144,6 +144,8 @@ export function Dashboard() {
     }
   );
 
+  const noData = !(grant.data && Object.keys(grant.data).length);
+
   if (grant.status === "error") {
     return (
       <Alert status="error">
@@ -220,11 +222,12 @@ export function Dashboard() {
         <StatLabel>Market Cap</StatLabel>
         <StatNumber data-testid="marketCap">${calcMarketCap().toLocaleString()}</StatNumber>
       </Stat>
-      <Chart 
+      {noData && <Text>There are no grants</Text>}
+      {!noData && <Chart 
         groupBy={mode} 
         shareholder={shareholder.data} 
         grant={grant.data} 
-        shares={shares.data} />
+        shares={shares.data} />}
       <Stack divider={<StackDivider />}>
         <Heading size="md">Shareholders</Heading>
         <Table>

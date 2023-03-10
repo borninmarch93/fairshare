@@ -11,6 +11,7 @@ import ShareholderGrantsStep from "../../modules/onboarding/components/Sharehold
 import { OnboardingContext } from "../../modules/onboarding/context/OnboardingContext";
 import { signupReducer } from "../../modules/onboarding/store";
 import { OnboardingFields } from "../../modules/onboarding/types";
+import SharePriceStep from "../../modules/onboarding/components/SharePriceStep";
 
 const defaultOnboardingState = {
   userName: "",
@@ -39,6 +40,7 @@ const Page = ({
         <Route path="/" element={<Navigate to="start/user" replace={true} />} />
         <Route path="/start/user" element={<UserStep />} />
         <Route path="/start/company" element={<CompanyStep />} />
+        <Route path="/start/shares" element={<SharePriceStep />} />
         <Route path="/start/shareholders" element={<ShareholdersStep />} />
         <Route
           path="start/grants"
