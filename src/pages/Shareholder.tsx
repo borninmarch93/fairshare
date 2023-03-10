@@ -143,7 +143,7 @@ export function ShareholderPage() {
         Shareholder
       </Heading>
       <Stack direction="row" spacing="8">
-        <Avatar width="100px" height="auto" />
+        <Avatar width="100px" height="100%" />
         <Stack>
           <Text fontSize="xl" fontWeight="bold">
             {shareholder.name}
