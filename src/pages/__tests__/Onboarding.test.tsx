@@ -18,6 +18,7 @@ const defaultOnboardingState = {
   companyName: "",
   shareholders: {},
   grants: {},
+  shares: {}
 };
 
 const Page = ({

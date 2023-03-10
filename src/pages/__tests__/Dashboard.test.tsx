@@ -68,6 +68,18 @@ describe("Dashboard", () => {
             type: "common",
           },
         },
+        shares: {
+          1: {
+            type: "common",
+            price: 3,
+            id: 1
+          },
+          2: {
+            type: "preferred",
+            price: 6,
+            id: 2
+          }
+        }
       },
       false
     );
@@ -82,7 +94,7 @@ describe("Dashboard", () => {
       { wrapper: ThemeWrapper }
     );
 
-    await screen.findByText("Tonya");
+    await screen.findAllByText("Tonya");
     expect(screen.getByTestId("shareholder-Tonya-grants")).toHaveTextContent(
       "2"
     );
@@ -516,5 +528,175 @@ describe("Dashboard", () => {
     expect(within(chart).getByText(/common/)).toBeInTheDocument();
   });
 
+  it("should show share company market cap", async () => {
+    const Router = getTestRouter("/dashboard");
+    const handlers = getHandlers(
+      {
+        company: { name: "My Company" },
+        shareholders: {
+          0: { name: "Tonya", grants: [1, 2], group: "founder", id: 0 },
+        },
+        grants: {
+          1: {
+            id: 1,
+            name: "Initial Grant",
+            amount: 10,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+          2: {
+            id: 2,
+            name: "Incentive Package 2020",
+            amount: 5,
+            issued: Date.now().toLocaleString(),
+            type: "preferred",
+          },
+        },
+        shares: {
+          1: {
+            type: "common",
+            price: 3,
+            id: 1
+          },
+          2: {
+            type: "preferred",
+            price: 6,
+            id: 2
+          }
+        }
+      },
+      false
+    );
+    server.use(...handlers);
+
+    render(
+      <Router>
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+    
+    const marketCap = await screen.findByText("Market Cap");
+    expect(marketCap).toBeInTheDocument();
+    expect(await screen.findByTestId('marketCap')).toHaveTextContent("$60");
+  });
+
+  it("should allow updating share price", async () => {
+    const Router = getTestRouter("/dashboard");
+    const handlers = getHandlers(
+      {
+        company: { name: "My Company" },
+        shareholders: {
+          0: { name: "Tonya", grants: [1], group: "founder", id: 0 },
+        },
+        grants: {
+          1: {
+            id: 1,
+            name: "Initial Grant",
+            amount: 10,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+        },
+        shares: {
+          1: {
+            type: "common",
+            price: 3,
+            id: 1
+          },
+        }
+      },
+      false
+    );
+    server.use(...handlers);
+
+    render(
+      <Router>
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+    
+    const editPriceButton = await screen.findByRole("button", {
+      name: /edit/i,
+    });
+    await userEvent.click(editPriceButton);
+
+    const sharePriceInput = screen.getByRole("textbox");
+    const saveButton = screen.getByRole("button", { name: /Save/ });
+    await userEvent.click(sharePriceInput);
+    await userEvent.clear(sharePriceInput);
+    await userEvent.paste("5");
+    await userEvent.click(saveButton);
+
+    await waitFor(() => expect(sharePriceInput).not.toBeVisible());
+    expect(
+      await screen.findByTestId("share-common-price")
+    ).toHaveTextContent("$5");
+  });
+
+  it("should show group by share amount", async () => {
+    const Router = getTestRouter("/dashboard/investor");
+    const handlers = getHandlers(
+      {
+        company: { name: "My Company" },
+        shareholders: {
+          0: { name: "Tonya", grants: [1, 2], group: "founder", id: 0 },
+          3: { name: "Timothy", grants: [6], group: "investor", id: 3 },
+        },
+        grants: {
+          1: {
+            id: 1,
+            name: "Initial Grant",
+            amount: 1000,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+          2: {
+            id: 2,
+            name: "Incentive Package 2020",
+            amount: 500,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+          6: {
+            id: 6,
+            name: "Series A Purchase",
+            amount: 500,
+            issued: Date.now().toLocaleString(),
+            type: "common",
+          },
+        },
+      },
+      false
+    );
+    server.use(...handlers);
+
+    render(
+      <Router>
+        <Routes>
+          <Route path="/dashboard/:mode" element={<Dashboard />} />
+        </Routes>
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+
+    const sharesNumChartButton = await screen.findByRole("tab", {
+      name: /share #/i,
+    });
+    const equityChartButton = await screen.findByRole("tab", {
+      name: /equity/i,
+    });
+    expect(sharesNumChartButton).toBeInTheDocument();
+    expect(equityChartButton).toBeInTheDocument();
+
+    await userEvent.click(equityChartButton);
+    const chart = await screen.findByRole("img");
+    expect(chart).toBeInTheDocument();
+  });
 });
 

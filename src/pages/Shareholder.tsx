@@ -83,7 +83,7 @@ export function ShareholderPage() {
               });
             }
           }
-        );
+        ); 
       },
     }
   );
@@ -192,7 +192,7 @@ export function ShareholderPage() {
                   <Td>{new Date(issued).toLocaleDateString()}</Td>
                   <Td>{amount}</Td>
                   <Td><Badge>{type}</Badge></Td>
-                  <Td>${equity?.toLocaleString()}</Td>
+                  <Td data-testid={`grant-${grantID}-equity`}>${equity?.toLocaleString()}</Td>
                 </Tr>
               );
             }

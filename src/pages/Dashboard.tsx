@@ -218,7 +218,7 @@ export function Dashboard() {
       </Stack>
       <Stat>
         <StatLabel>Market Cap</StatLabel>
-        <StatNumber>${calcMarketCap().toLocaleString()}</StatNumber>
+        <StatNumber data-testid="marketCap">${calcMarketCap().toLocaleString()}</StatNumber>
       </Stat>
       <Chart 
         groupBy={mode} 
@@ -307,8 +307,8 @@ export function Dashboard() {
           <Tbody>
             {Object.values(shares?.data || {}).map((s) => (
               <Tr key={s.id}>
-                <Td data-testid={`share-${s.type}`}><Badge>{s.type}</Badge></Td>
-                <Td data-testid={`share-${s.price}`}>
+                <Td data-testid={`share-${s.type}-type`}><Badge>{s.type}</Badge></Td>
+                <Td data-testid={`share-${s.type}-price`}>
                   ${s.price}
                 </Td>
                 <Td>
