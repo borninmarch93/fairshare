@@ -405,6 +405,50 @@ describe("Onboarding", () => {
   });
 
   //Bug 07
+  it("should allow registering with multiple shareholders", async () => {
+    const Router = getTestRouter("/start/shareholders");
+    render(
+      <Router>
+        <Page
+          initialState={{
+            ...defaultOnboardingState,
+            userName: 'Aaron',
+            email: 'myemail@gmail.com',
+            shares: {
+              1: {
+                type: "common",
+                price: 3,
+                id: 1
+              },
+              2: {
+                type: "preferred",
+                price: 5,
+                id: 2
+              },
+            },
+            companyName: "My Company",
+            shareholders: {
+              0: { name: "Jenn", group: "founder", grants: [], id: 0 },
+              1: { name: "Aaron", group: "employee", grants: [], id: 1 },
+            }
+          }}
+        />
+      </Router>,
+      { wrapper: ThemeWrapper }
+    );
+    const history = createMemoryHistory();
+
+    let nextButton = screen.getByRole("link", { name: /Next/ });
+    await userEvent.click(nextButton);
+
+    nextButton = screen.getByRole("link", { name: /Next/ });
+    await userEvent.click(nextButton);
+    
+    nextButton = screen.getByRole("link", { name: /Next/ });
+    await userEvent.click(nextButton);
+
+    expect(history.location.pathname).toBe('/');
+  })
 
   //Bug 08
   it('should not allow adding grant without name/amount/date',  async () => {
@@ -458,7 +502,7 @@ describe("Onboarding", () => {
   });
 
   //Bug 09
-  it('should be able to add any number of shares',  async () => {
+  it('should be able to add any amount of shares',  async () => {
     const Router = getTestRouter("/start/grants/0");
     render(
       <Router>
@@ -466,7 +510,17 @@ describe("Onboarding", () => {
           initialState={{
             ...defaultOnboardingState,
             shareholders: {
-              "0": { name: "Jenn", group: "founder", grants: [], id: 0 },
+              0: { name: "Jenn", group: "founder", grants: [1], id: 0 },
+              1: { name: "Aaron", group: "employee", grants: [2], id: 1 },
+            },
+            grants: {
+              1: {
+                id: 1,
+                name: "Initial issuance",
+                amount: 1000,
+                issued: Date.now().toLocaleString(),
+                type: "common",
+              },
             },
           }}
         />
