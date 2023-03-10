@@ -11,10 +11,10 @@ import {
 import { Grant, Share, Shareholder } from "../types";
 import { useQuery } from "react-query";
 import Chart from "../modules/dashboard/components/Chart";
-import DashboardNav from "../modules/dashboard/components/DashboardNav";
 import DashboardStats from "../modules/dashboard/components/DashboardStats";
 import ShareholdersTable from "../modules/dashboard/components/ShareholdersTable";
 import SharesTable from "../modules/dashboard/components/SharesTable";
+import DashboardNav from "../modules/dashboard/components/DashboardNav";
 
 export function Dashboard() {
   
@@ -72,7 +72,6 @@ export function Dashboard() {
     <Stack>
       <DashboardNav mode={mode} />
       <DashboardStats marketCap={calcMarketCap()} />
-
       {noData && <Text>There are no grants</Text>}
       {!noData && <Chart
         groupBy={mode}
