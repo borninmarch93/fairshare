@@ -2,47 +2,54 @@ import { Modal, ModalContent, Stack, FormControl, Input, Select, Button } from "
 import { Share, ShareType } from "../../../types";
 
 interface AddShareModalProps {
-    isOpen: boolean,
-    onClose: () => void,
-    onSubmit: (e: React.FormEvent) => void,
-    value: Omit<Share, "id">,
-    onChange: (grant: Omit<Share, "id">) => void,
+  isOpen: boolean,
+  onClose: () => void,
+  onSubmit: (e: React.FormEvent) => void,
+  value: Omit<Share, "id">,
+  onChange: (grant: Omit<Share, "id">) => void,
+  availableTypes: ShareType[]
 }
 
-const AddShareModal: React.FC<AddShareModalProps> = ({ isOpen, onClose, onSubmit, value, onChange }) => {
-    const isShareValid = value.type && value.price;
+const shareTypeLabels = {
+  "common": "Common",
+  "preferred": "Preferred"
+}
 
-    return (
-        <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalContent>
-          <Stack p="10" as="form" onSubmit={onSubmit}>
-            <FormControl>
-              <Select 
+const AddShareModal: React.FC<AddShareModalProps> = ({ isOpen, onClose, onSubmit, value, onChange, availableTypes }) => {
+  const isShareValid = value.type && value.price;
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalContent>
+        <Stack p="10" as="form" onSubmit={onSubmit}>
+          <FormControl>
+            <Select
               variant="flushed"
-              value={value.type} 
-              data-testid="share-type" 
-              onChange={(e) => onChange({...value, type: e.target.value as ShareType})}>
-                <option disabled value="">Type of Shares</option>
-                <option value="common">Common</option>
-                <option value="preferred">Preferred</option>
-              </Select>
-            </FormControl>
-            <FormControl>
-              <Input
-                variant="flushed"
-                placeholder="Share price"
-                data-testid="share-price"
-                value={value.price || ""}
-                onChange={(e) =>
-                  onChange({ ...value, price: parseInt(e.target.value)})
-                }
-              />
-            </FormControl>
-            <Button type="submit" isDisabled={!isShareValid}>Save</Button>
-          </Stack>
-        </ModalContent>
-      </Modal>
-    )
+              value={value.type}
+              data-testid="share-type"
+              onChange={(e) => onChange({ ...value, type: e.target.value as ShareType })}>
+              <option disabled value="">Type of Shares</option>
+              {availableTypes.map(availableType => <option key={availableType} value={availableType}>
+                {shareTypeLabels[availableType]}
+              </option>)}
+            </Select>
+          </FormControl>
+          <FormControl>
+            <Input
+              variant="flushed"
+              placeholder="Share price"
+              data-testid="share-price"
+              value={value.price || ""}
+              onChange={(e) =>
+                onChange({ ...value, price: parseInt(e.target.value) })
+              }
+            />
+          </FormControl>
+          <Button type="submit" isDisabled={!isShareValid}>Save</Button>
+        </Stack>
+      </ModalContent>
+    </Modal>
+  )
 };
 
 export default AddShareModal;

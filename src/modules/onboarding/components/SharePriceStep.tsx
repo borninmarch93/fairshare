@@ -1,43 +1,53 @@
 import { Stack, Text, Button, Badge, Table, Tbody, Td, Th, Thead, Tr, useDisclosure } from "@chakra-ui/react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Share } from "../../../types";
+import { Share, ShareType } from "../../../types";
 import AddShareModal from "../../shares/components/AddShareModal";
 import { OnboardingContext } from "../context/OnboardingContext";
 
 const SharePriceStep = () => {
-    const { shares, companyName, dispatch, } = useContext(OnboardingContext);
-    const navigate = useNavigate();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
+  const { shares, companyName, dispatch, } = useContext(OnboardingContext);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const [draftShare, setDraftShare] = React.useState<Omit<Share, "id">>({
-        type: "common",
-        price: 0,
-      });
+  const [availableTypes, setAvailableTypes] = useState<ShareType[]>(["common", "preferred"]);
+  const [draftShare, setDraftShare] = React.useState<Omit<Share, "id">>({
+    type: "common",
+    price: 0,
+  });
 
-      useEffect(() => {
-        if (!companyName) {
-          return navigate("/start/company");
-        }
-      }, [companyName]);
-
-    function submitShare(e: React.FormEvent) {
-        e.preventDefault();
-        dispatch({
-          type: "addShare",
-          payload: draftShare,
-        });
-        onClose();
-        setDraftShare({ type: "common", price: 0 });
+  useEffect(() => {
+    if (!companyName) {
+      return navigate("/start/company");
     }
+  }, [companyName]);
 
-    const shareChangeHandler = (share: Omit<Share, "id">) => {
-        setDraftShare(share);
-    }
+  function submitShare(e: React.FormEvent) {
+    e.preventDefault();
+    dispatch({
+      type: "addShare",
+      payload: draftShare,
+    });
+    onClose();
+    setAvailableTypes(prev => prev.filter(shareType => shareType !== draftShare.type))
+  }
 
-    return (
-        <Stack>
+  const openHandler = () => {
+    setDraftShare({ type: availableTypes[0], price: 0 });
+    onOpen();
+  }
+
+  const shareChangeHandler = (share: Omit<Share, "id">) => {
+    setDraftShare(share);
+  }
+
+  const nextHandler = () => {
+    navigate("/start/shareholders");
+  }
+
+  return (
+    <Stack>
       <Text color="teal-400">
         What shares does <strong>{companyName}</strong> have?
       </Text>
@@ -55,7 +65,7 @@ const SharePriceStep = () => {
               <Td>{share.price}</Td>
             </Tr>
           ))}
-          {Object.keys(shares).length === 0 && (
+          {!Object.keys(shares).length && (
             <Tr>
               <Td colSpan={3} textAlign="center">
                 No shares to show for <strong>{companyName}</strong>
@@ -64,21 +74,23 @@ const SharePriceStep = () => {
           )}
         </Tbody>
       </Table>
-      <Button variant="outline" onClick={onOpen}>
+      {availableTypes.length && <Button variant="outline" onClick={openHandler}>
         Add Share
       </Button>
+      }
       <AddShareModal
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={submitShare}
         value={draftShare}
         onChange={shareChangeHandler}
+        availableTypes={availableTypes}
       />
-      <Button as={Link} to="/start/shareholders" colorScheme="teal">
+      <Button onClick={nextHandler} isDisabled={!Object.keys(shares).length} colorScheme="teal">
         Next
       </Button>
     </Stack>
-    )
+  )
 }
 
 export default SharePriceStep;
