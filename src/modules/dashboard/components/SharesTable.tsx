@@ -2,6 +2,7 @@ import { Stack, Heading, Button, Badge, Table, Tbody, Td, Thead, Tr, useDisclosu
 import produce from "immer";
 import React from "react";
 import { useMutation, useQueryClient } from "react-query";
+import { putShare } from "../../../apis/shares";
 import { Share } from "../../../types";
 import UpdateShareModal from "../../shares/components/UpdateShareModal";
 
@@ -31,12 +32,7 @@ const SharesTable: React.FC<SharesTableProps> = ({ shares }) => {
         unknown,
         Share
     >(
-        (share) =>
-            fetch("/share/update", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(share),
-            }).then((res) => res.json()),
+        putShare,
         {
             onSuccess: (data) => {
                 queryClient.setQueryData<{ [id: number]: Share } | undefined>(

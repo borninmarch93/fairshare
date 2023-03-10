@@ -2,6 +2,7 @@ import { Stack, Spinner, Text, Alert, AlertDescription, AlertIcon, AlertTitle } 
 import React, { useContext, useState } from "react";
 import { useQueryClient, useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { postShare } from "../../../apis/shares";
 import { AuthContext } from "../../../App";
 import { Grant, Shareholder, User, Company, Share } from "../../../types";
 import { OnboardingContext } from "../context/OnboardingContext";
@@ -14,13 +15,7 @@ const DoneStep = () => {
     useContext(OnboardingContext);
   const [error, setError] = useState(false);
 
-  const shareMutation = useMutation<Share, unknown, Share>((share) =>
-    fetch("/share/new", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(share),
-    }).then((res) => res.json())
-  );
+  const shareMutation = useMutation<Share, unknown, Share>(postShare);
 
   const grantMutation = useMutation<Grant, unknown, Grant>((grant) =>
     fetch("/grant/new", {

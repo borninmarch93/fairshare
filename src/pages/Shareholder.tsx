@@ -24,6 +24,7 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import produce from "immer";
 import AddGrantModal from "../modules/shareholder/components/AddGrantModal";
 import { getGrantsWithEquity, getSharePricesPerType } from "../modules/dashboard/utils/utils";
+import { postGrant } from "../apis/grant";
 
 export function ShareholderPage() {
   const queryClient = useQueryClient();
@@ -54,15 +55,7 @@ export function ShareholderPage() {
   });
 
   const grantMutation = useMutation<Grant, unknown, Omit<Grant, "id">>(
-    (grant) =>
-      fetch("/grant/new", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shareholderID: parseInt(shareholderID, 10),
-          grant,
-        }),
-      }).then((res) => res.json()),
+    (grant) => postGrant(grant, shareholderID),
     {
       onSuccess: (data) => {
         // this doesn't seem to triggering an instant re-render on consumers even though thats that it should ...

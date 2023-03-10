@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "react-query";
 import { Grant, Shareholder } from "../../../types";
 import AddShareholderModal from "../../shareholder/components/AddShareholderModal";
+import { postNewShareholder } from "../../../apis/shareholder";
 
 interface ShareholdersTableProps {
     shareholders: { [dataID: number]: Shareholder }
@@ -22,12 +23,7 @@ const ShareholdersTable: React.FC<ShareholdersTableProps> = ({ shareholders, gra
         unknown,
         Omit<Shareholder, "id" | "grants">
     >(
-        (shareholder) =>
-            fetch("/shareholder/new", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(shareholder),
-            }).then((res) => res.json()),
+        postNewShareholder,
         {
             onSuccess: (data) => {
                 queryClient.setQueryData<{ [id: number]: Shareholder } | undefined>(
