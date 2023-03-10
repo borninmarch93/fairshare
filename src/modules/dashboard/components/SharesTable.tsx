@@ -77,7 +77,7 @@ const SharesTable: React.FC<SharesTableProps> = ({ shares }) => {
                         <Tr key={s.id}>
                             <Td data-testid={`share-${s.type}-type`}><Badge>{s.type}</Badge></Td>
                             <Td data-testid={`share-${s.type}-price`}>
-                                ${s.price}
+                                ${s.price.toLocaleString()}
                             </Td>
                             <Td>
                                 <Button variant="link" data-share-id={4} onClick={() => updateShareTypeValue(s.id)}>Edit</Button>

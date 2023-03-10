@@ -1,4 +1,4 @@
-import { Modal, ModalContent, Stack, FormControl, Input, Select, Button } from "@chakra-ui/react";
+import { Modal, ModalContent, Stack, FormControl, Input, Select, Button, InputGroup, InputLeftElement } from "@chakra-ui/react";
 import { Share, ShareType } from "../../../types";
 
 interface AddShareModalProps {
@@ -35,15 +35,23 @@ const AddShareModal: React.FC<AddShareModalProps> = ({ isOpen, onClose, onSubmit
             </Select>
           </FormControl>
           <FormControl>
-            <Input
-              variant="flushed"
-              placeholder="Share price"
-              data-testid="share-price"
-              value={value.price || ""}
-              onChange={(e) =>
-                onChange({ ...value, price: parseInt(e.target.value) })
-              }
-            />
+            <InputGroup>
+              <InputLeftElement
+                pointerEvents='none'
+                color='gray.300'
+                fontSize='1.2em'
+                children='$'
+              />
+              <Input
+                variant="flushed"
+                placeholder="Share price"
+                data-testid="share-price"
+                value={value.price || ""}
+                onChange={(e) =>
+                  onChange({ ...value, price: parseInt(e.target.value) })
+                }
+              />
+            </InputGroup>
           </FormControl>
           <Button type="submit" isDisabled={!isShareValid}>Save</Button>
         </Stack>
