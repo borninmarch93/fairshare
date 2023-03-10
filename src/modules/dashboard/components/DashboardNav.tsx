@@ -22,6 +22,7 @@ const DashboardNav: React.FC<DashboardNavProps> = ({ mode }) => {
             </Heading>
             <Stack direction="row">
                 <Button
+                    size={"sm"}
                     colorScheme="teal"
                     as={Link}
                     to="/dashboard/investor"
@@ -31,6 +32,7 @@ const DashboardNav: React.FC<DashboardNavProps> = ({ mode }) => {
                     By Investor
                 </Button>
                 <Button
+                    size={"sm"}
                     colorScheme="teal"
                     as={Link}
                     to="/dashboard/group"
@@ -40,6 +42,7 @@ const DashboardNav: React.FC<DashboardNavProps> = ({ mode }) => {
                     By Group
                 </Button>
                 <Button
+                    size={"sm"}
                     colorScheme="teal"
                     as={Link}
                     to="/dashboard/shareType"

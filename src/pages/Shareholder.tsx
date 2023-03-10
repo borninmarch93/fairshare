@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
 import {
   Text,
@@ -25,11 +25,13 @@ import produce from "immer";
 import AddGrantModal from "../modules/shareholder/components/AddGrantModal";
 import { getGrantsWithEquity, getSharePricesPerType } from "../modules/dashboard/utils/utils";
 import { postGrant } from "../apis/grant";
+import { AuthContext } from "../App";
 
 export function ShareholderPage() {
   const queryClient = useQueryClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { shareholderID = '' } = useParams();
+  const { deauthorize } = useContext(AuthContext);
   const grants = useQuery<{ [dataID: number]: Grant }>("grants", () =>
     fetch("/grants").then((e) => e.json())
   );
@@ -78,7 +80,7 @@ export function ShareholderPage() {
               });
             }
           }
-        ); 
+        );
       },
     }
   );
@@ -131,6 +133,11 @@ export function ShareholderPage() {
         >
           Fair Share
         </Heading>
+        <Stack direction="row" justify="flex-end" >
+          <Button colorScheme="teal" onClick={() => { }}>
+            Logout
+          </Button>
+        </Stack>
       </Stack>
       <Heading size="md" textAlign="center">
         Shareholder
