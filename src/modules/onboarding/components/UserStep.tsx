@@ -16,6 +16,7 @@ const UserStep = () => {
             <FormControl id="userName" size="lg" color="teal.400">
                 <FormLabel>First, who is setting up this account?</FormLabel>
                 <Input
+                    variant="flushed"
                     type="text"
                     placeholder="Your Name"
                     onChange={(e) =>
@@ -27,6 +28,7 @@ const UserStep = () => {
             <FormControl id="email" size="lg" color="teal.400">
                 <FormLabel>What email will you use to sign in?</FormLabel>
                 <Input
+                    variant="flushed"
                     type="email"
                     placeholder="Your Email"
                     onChange={(e) =>

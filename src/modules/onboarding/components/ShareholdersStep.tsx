@@ -2,6 +2,7 @@ import { useDisclosure, Stack, StackDivider, Badge, Modal, ModalContent, Input, 
 import React, { useContext, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Shareholder, ShareholderGroup } from "../../../types";
+import AddShareholderModal from "../../shareholder/components/AddShareholderModal";
 import { OnboardingContext } from "../context/OnboardingContext";
 
 const ShareholdersStep = () => {
@@ -37,36 +38,12 @@ const ShareholdersStep = () => {
             <Badge>{s.group}</Badge>
           </Stack>
         ))}
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalContent>
-            <Stack p="10" as="form" onSubmit={submitNewShareholder}>
-              <Input
-                value={newShareholder.name}
-                placeholder="Shareholder Name"
-                onChange={(e) =>
-                  setNewShareholder((s) => ({ ...s, name: e.target.value }))
-                }
-              />
-              <Select
-                value={newShareholder.group}
-                onChange={(e) =>
-                  setNewShareholder((s) => ({
-                    ...s,
-                    group: e.target.value as ShareholderGroup,
-                  }))
-                }
-              >
-                <option disabled value="">Type of Shareholder</option>
-                <option value="investor">Investor</option>
-                <option value="founder">Founder</option>
-                <option value="employee">Employee</option>
-              </Select>
-              <Button type="submit" colorScheme="teal" isDisabled={!newShareholder.name.length}>
-                Create
-              </Button>
-            </Stack>
-          </ModalContent>
-        </Modal>
+        <AddShareholderModal
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={submitNewShareholder}
+                value={newShareholder}
+                onChange={(shareholder) => setNewShareholder(shareholder)} />
       </Stack>
       <Button colorScheme="teal" variant="outline" onClick={onOpen}>
         Add Shareholder

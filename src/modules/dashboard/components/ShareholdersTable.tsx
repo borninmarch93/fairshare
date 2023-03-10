@@ -5,6 +5,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "react-query";
 import { Grant, Shareholder } from "../../../types";
+import AddShareholderModal from "../../shareholder/components/AddShareholderModal";
 
 interface ShareholdersTableProps {
     shareholders: { [dataID: number]: Shareholder }
@@ -88,36 +89,12 @@ const ShareholdersTable: React.FC<ShareholdersTableProps> = ({ shareholders, gra
             </Table>
             <Button onClick={onOpen}>Add Shareholder</Button>
 
-            <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalContent>
-                    <Stack p="10" as="form" onSubmit={submitNewShareholder}>
-                        <Input
-                            value={newShareholder.name}
-                            placeholder="Shareholder Name"
-                            onChange={(e) =>
-                                setNewShareholder((s) => ({ ...s, name: e.target.value }))
-                            }
-                        />
-                        <Select
-                            value={newShareholder.group}
-                            onChange={(e) =>
-                                setNewShareholder((s) => ({
-                                    ...s,
-                                    group: e.target.value as any,
-                                }))
-                            }
-                        >
-                            <option disabled value="">Type of Shareholder</option>
-                            <option value="investor">Investor</option>
-                            <option value="founder">Founder</option>
-                            <option value="employee">Employee</option>
-                        </Select>
-                        <Button type="submit" colorScheme="teal" isDisabled={!newShareholder.name.length}>
-                            Save
-                        </Button>
-                    </Stack>
-                </ModalContent>
-            </Modal>
+            <AddShareholderModal
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={submitNewShareholder}
+                value={newShareholder}
+                onChange={(shareholder) => setNewShareholder(shareholder)} />
         </Stack>
     );
 }

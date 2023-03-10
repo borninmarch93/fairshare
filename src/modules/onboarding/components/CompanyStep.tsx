@@ -23,6 +23,7 @@ const CompanyStep = () => {
       <FormControl id="companyName" size="lg" color="teal.400">
         <FormLabel>What company are we examining?</FormLabel>
         <Input
+          variant="flushed"
           type="text"
           placeholder="Company Name"
           onChange={(e) =>
