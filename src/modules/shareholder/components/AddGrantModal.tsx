@@ -7,9 +7,15 @@ interface AddGrantModalProps {
     onSubmit: (e: React.FormEvent) => void,
     value: Omit<Grant, "id">,
     onChange: (grant: Omit<Grant, "id">) => void,
+    availableTypes: ShareType[]
 }
 
-const AddGrantModal: React.FC<AddGrantModalProps> = ({ isOpen, onClose, onSubmit, value, onChange }) => {
+const shareTypeLabels = {
+  "common": "Common",
+  "preferred": "Preferred"
+}
+
+const AddGrantModal: React.FC<AddGrantModalProps> = ({ isOpen, onClose, onSubmit, value, onChange, availableTypes }) => {
     const isGrantValid = value.name.length && value.amount && value.issued;
 
     return (
@@ -39,8 +45,9 @@ const AddGrantModal: React.FC<AddGrantModalProps> = ({ isOpen, onClose, onSubmit
               data-testid="grant-share-type" 
               onChange={(e) => onChange({...value, type: e.target.value as ShareType})}>
                 <option disabled value="">Type of Shares</option>
-                <option value="common">Common</option>
-                <option value="preferred">Preferred</option>
+                {availableTypes.map(availableType => <option key={availableType} value={availableType}>
+                {shareTypeLabels[availableType]}
+              </option>)}
               </Select>
             </FormControl>
             <FormControl>

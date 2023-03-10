@@ -42,6 +42,8 @@ export function ShareholderPage() {
     "shares",
     () => fetch("/shares").then((e) => e.json())
   );
+  const availableTypes = Object.values(shares.data ?? {}).map(share => share.type);
+
   const grantsWithEquity = getGrantsWithEquity(shares.data, grants.data);
 
   const [draftGrant, setDraftGrant] = React.useState<Omit<Grant, "id">>({
@@ -210,6 +212,7 @@ export function ShareholderPage() {
         onSubmit={submitGrant}
         value={draftGrant}
         onChange={grantChangeHandler}
+        availableTypes={availableTypes}
       />
     </Stack>
   );
